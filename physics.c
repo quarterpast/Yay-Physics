@@ -93,11 +93,15 @@ Vector coordToScreen(Vector *pos) {
 	return out;
 }
 
-void circle(Vector *pos, double r, Colour c) {
+void glColour(Colour *c) {
+	glColor3f(c->r,c->g,c->b);
+}
+
+void circle(Vector *pos, double r, Colour *c) {
 	double t;
 	Vector sc = coordToScreen(pos);
 	glBegin(GL_TRIANGLE_FAN);
-	glColor3f(c.r,c.g,c.b);
+	glColour(c);
 	glVertex2f(sc.x,sc.y);
 	r = fmax(r,2);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
@@ -157,7 +161,6 @@ Colour randColour() {
 	Colour out = {r,g,b};
 	return out;
 }
-
 Body newBody(Vector pos, Vector vel, double mass) {
 	Vector *arr = malloc(PATHLEN*sizeof(Vector));
 	int i;
@@ -208,7 +211,7 @@ void step() {
 			b[j].path.pos -= PATHLEN;
 		}
 		b[j].path.point[b[j].path.pos] = b[j].position;
-		circle(&(b[j].position),sqrt(b[j].mass),b[j].colour);
+		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
 	glutSwapBuffers();
