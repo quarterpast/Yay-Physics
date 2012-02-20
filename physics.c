@@ -12,7 +12,7 @@
 #define PATHLEN 10000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
-double timeStep = 60.0;
+double timeStep = 16.0;
 
 typedef struct {
 	double r;
@@ -86,7 +86,7 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 		diff = vminus(&(b.position),&(thing->position));
 
 		u = unit(&diff);
-		m = smult(4*n,&u);
+		m = smult(n,&u);
 		ds = vplus(&ds,&m);
 	}
 	return ds;
@@ -212,9 +212,9 @@ Vector newVector(double x, double y) {
 }
 
 
-Body b[4] = {};
+Body *b;
 
-static const int bodies = 4;
+int bodies;
 
 int startTime;
 int prevTime;
@@ -264,11 +264,22 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Yay physics");
 
 	srand(time(NULL));
+	if(argc < 2) return 1;
 
-	b[0] = newBody(newVector(0,.5),newVector(0.0003,0),200);
-	b[1] = newBody(newVector(.5,0),newVector(-0.0001,-0.0004),20);
-	b[2] = newBody(newVector(-.5,0),newVector(0.0001,0.0004),20);
-	b[3] = newBody(newVector(0,-.5),newVector(-0.0003,0),200);
+	bodies = atoi(argv[1]);
+	b = malloc(bodies*sizeof(Body));
+	int i;
+	b[0] = newBody(newVector(0,0.0001),newVector(0,0),1000);
+	for(i=1;i<bodies;++i) {
+		b[i] = newBody(newVector(
+			1-2*(float)rand()/(float)RAND_MAX,
+			1-2*(float)rand()/(float)RAND_MAX
+		),
+		newVector(
+			0.002-0.004*(float)rand()/(float)RAND_MAX,
+			0.002-0.004*(float)rand()/(float)RAND_MAX
+		),10*(float)rand()/(float)RAND_MAX);
+	}
 
 	startTime = glutGet(GLUT_ELAPSED_TIME);
 	prevTime = startTime;
