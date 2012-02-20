@@ -11,6 +11,12 @@ typedef struct {
 	double y;
 } Vector;
 
+typedef struct node {
+	Vector pos;
+	struct node *next;
+	struct node *prev;
+} Path;
+
 typedef struct {
 	Vector position;
 	Vector velocity;
@@ -18,12 +24,6 @@ typedef struct {
 	double mass;
 	Path first;
 } Body;
-
-typedef struct {
-	Vector pos;
-	Path *next;
-	Path *prev;
-} Path
 
 double newt(double m, double r) {
 	return G*m/(r*r);
@@ -112,15 +112,30 @@ void reshape (int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
 
-Body b[6] = {
-	{{0,0},{0,0},{0,0},1000},
-	{{0.5,0},{0,0.004},{0,0},0.001},
-	{{-0.2,0},{0,0.008},{0,0},0.01},
-	{{0,-0.2},{0.008,0},{0,0},0.01},
-	{{0.2,0.2},{0,0.004},{0,0},0.01},
-	{{-0.2,-0.4},{0.002,0.004},{0,0},1}
-};
-static const int bodies = 6;
+Body newBody(Vector pos, Vector vel, double mass) {
+	Body out = {
+		pos,
+		vel,
+		{0,0},
+		mass,
+		{
+			pos,
+			NULL,
+			NULL
+		}
+	};
+
+	return out;
+}
+Vector newVector(double x, double y) {
+	Vector out = {x,y};
+	return out;
+}
+
+
+Body b[2] = {};
+
+static const int bodies = 4;
 
 void step() {
 	int j;
@@ -147,6 +162,12 @@ int main(int argc, char **argv) {
 	glutInitWindowSize (WIDTH, HEIGHT);
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
+
+
+	b[0] = newBody(newVector(0,0.00001),newVector(0,0),100);
+	b[1] = newBody(newVector(1,0),newVector(0,0.001),1);
+	b[2] = newBody(newVector(-0.7,0),newVector(0,0.0005),1);
+	b[3] = newBody(newVector(0,0.5),newVector(0.001,0.001),1);
 
 	//glutDisplayFunc(display);
 	glutTimerFunc(TIMERMSECS, step, 0);
