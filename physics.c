@@ -123,6 +123,7 @@ void endPath(Body *b) {
 }
 
 void traverse(
+	
 	Body *b,
 	void (*start)(Body*),
 	void (*cb)(Body*,Vector*),
@@ -181,7 +182,8 @@ void step() {
 	for(j = 0; j<bodies; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-		b[j].path.point[b[j].path.pos++] = b[j].position;
+		b[j].path.pos = (b[j].path.pos + 1) % PATHLEN;
+		b[j].path.point[b[j].path.pos] = b[j].position;
 		circle(&(b[j].position),sqrt(b[j].mass));
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
