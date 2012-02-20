@@ -66,7 +66,7 @@ int main(int argc, char **argv) {
 		{0,0},
 		{0,0},
 		{0,0}
-	}
+	};
 	Body b[3] = {
 		{{0,0},{0,0},1},
 		{{1,1},{0,0},2},
@@ -77,8 +77,8 @@ int main(int argc, char **argv) {
 			ds[j] = move(&(b[j]),b,3);
 		}
 		for(j = 0; j<3; ++j) {
-			b[j].position = vplus(&(b.position),&ds[j]));
+			b[j].position = vplus(&(b[j].position),&ds[j]);
 		}
-		print(&(a.position),"");
+		print(&(b[0].position),"");
 	}
 }
