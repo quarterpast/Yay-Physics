@@ -6,9 +6,11 @@
 #define G 1e-8
 #define WIDTH 750
 #define HEIGHT 750
-#define TIMERMSECS 1000/60
-#define PATHLEN 1024
+#define TIMERSTEP 1.1
+#define PATHLEN 10000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
+
+double timermsecs = 1000/60;
 
 typedef struct {
 	double r;
@@ -119,6 +121,13 @@ void keyPressed (unsigned char key, int x, int y) {
 	if(key == 'q') {
 		glutLeaveMainLoop();
 	}
+	if(key == '+') {
+		printf("%lf\n",timermsecs);
+		timermsecs *= 1/TIMERSTEP;
+	}
+	if(key == '-') {
+		timermsecs *= TIMERSTEP;
+	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
 	}
@@ -205,7 +214,7 @@ static const int bodies = 4;
 
 void step() {
 	int j;
-	glutTimerFunc(TIMERMSECS, step, 0);
+	glutTimerFunc(timermsecs, step, 0);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 	glClearColor(0,0,0,1);
@@ -235,13 +244,13 @@ int main(int argc, char **argv) {
 
 	srand(time(NULL));
 
-	b[0] = newBody(newVector(0,0.00001),newVector(0,0),100);
-	b[1] = newBody(newVector(1,0),newVector(0,0.001),1);
-	b[2] = newBody(newVector(-0.7,0),newVector(0,0.0005),1);
-	b[3] = newBody(newVector(0,0.5),newVector(0.001,0.001),1);
+	b[0] = newBody(newVector(0,.5),newVector(0.0005,0),20);
+	b[1] = newBody(newVector(.5,0),newVector(0,-0.0005),20);
+	b[2] = newBody(newVector(-.5,0),newVector(0,0.0005),20);
+	b[3] = newBody(newVector(0,-.5),newVector(-0.0005,0),20);
 
 	//glutDisplayFunc(display);
-	glutTimerFunc(TIMERMSECS, step, 0);
+	glutTimerFunc(timermsecs, step, 0);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
