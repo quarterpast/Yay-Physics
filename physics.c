@@ -74,7 +74,7 @@ void circle(Vector *pos, double r) {
 	glBegin(GL_LINE_LOOP);
 	r = fmax(r,1);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
-		glVertex2f(pos->x + sin(t) * r/width, pos->y + cos(t) * r/height);
+		glVertex2f(pos->x*768/width + sin(t) * r/width, pos->y*768/height + cos(t) * r/height);
 	}
 	glEnd();
 }
