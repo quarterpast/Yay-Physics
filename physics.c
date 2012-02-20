@@ -7,7 +7,7 @@
 #define WIDTH 750
 #define HEIGHT 750
 #define TIMERMSECS 1000/60
-#define PATHLEN 500
+#define PATHLEN 1024
 
 typedef struct {
 	double r;
@@ -133,7 +133,6 @@ void endPath(Body *b) {
 }
 
 void traverse(
-	
 	Body *b,
 	void (*start)(Body*),
 	void (*cb)(Body*,Vector*),
@@ -141,7 +140,7 @@ void traverse(
 ) {
 	int i,j;
 	start(b);
-	for(i = 0; i<PATHLEN; ++i) {
+	for(i = 1; i<PATHLEN; i++) {
 		j = i+b->path.pos;
 		if(j > PATHLEN) {
 			j -= PATHLEN;
@@ -161,6 +160,7 @@ Colour randColour() {
 
 Body newBody(Vector pos, Vector vel, double mass) {
 	Vector *arr = malloc(PATHLEN*sizeof(Vector));
+	arr[0] = pos;
 	int i;
 	Path path = {
 		arr,
@@ -201,7 +201,12 @@ void step() {
 	for(j = 0; j<bodies; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-		b[j].path.pos = (b[j].path.pos + 1) % PATHLEN;
+		if(b[j].path.pos >= PATHLEN) {
+			b[j].path.pos = b[j].path.pos + 1 - PATHLEN;
+		}
+		else {
+			b[j].path.pos++;
+		}
 		b[j].path.point[b[j].path.pos] = b[j].position;
 		circle(&(b[j].position),sqrt(b[j].mass),b[j].colour);
 		traverse(&(b[j]),startPath,drawPath,endPath);
