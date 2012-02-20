@@ -2,6 +2,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <GL/glut.h>
 #define G 1e-8
 #define WIDTH 750
@@ -126,7 +127,6 @@ void keyPressed (unsigned char key, int x, int y) {
 }
 
 Colour fade(Colour *c,int i) {
-	printf("%f\n",c->a*(double)i/(double)PATHLEN);
 	Colour out = {
 		c->r,
 		c->g,
@@ -232,10 +232,14 @@ void step() {
 
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_DOUBLE);
+	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
 	glutInitWindowSize (WIDTH, HEIGHT);
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
+
+	GLboolean out;
+	glGetBooleanv(GL_RGBA_MODE,&out);
+	printf("%d\n",out);
 
 	srand(time(NULL));
 
