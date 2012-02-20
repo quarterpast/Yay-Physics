@@ -67,7 +67,7 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 	return ds;
 }
 
-void circle(Vector &pos, double r) {
+void circle(Vector *pos, double r) {
 	double t;
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex2f(pos->x, pos->y);
