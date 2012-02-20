@@ -28,7 +28,7 @@ Vector smult(double l, Vector *a) {
 	Vector out = {(a->x)*l, (a->y)*l};
 	return out;
 }
-void print(Vector *a,char *str) {
+void vprint(Vector *a,char *str) {
 	printf("%s(%f,%f)\n",str,a->x,a->y);
 }
 double norm(Vector *a) {
@@ -57,6 +57,7 @@ Vector move(Body* thing, Body* rest, int l) {
 		m = smult(n,&u);
 		ds = vplus(&ds,&m);
 	}
+	vprint(&ds,"mv ");
 	return ds;
 }
 
@@ -75,6 +76,7 @@ int main(int argc, char **argv) {
 	for(i = 0; i<1000; ++i) {
 		for(j = 0; j<3; ++j) {
 			ds[j] = move(&(b[j]),b,3);
+			vprint(&(ds[j]),"ds ");
 		}
 		for(j = 0; j<3; ++j) {
 			b[j].position = vplus(&(b[j].position),&ds[j]);
