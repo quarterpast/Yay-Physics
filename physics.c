@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <GL/glut.h>
-#define G 1e-4
+#define G 2e-8
 
 typedef struct {
 	double x;
@@ -69,23 +69,24 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 
 void circle(Vector *pos, double r) {
 	double t;
-	glBegin(GL_TRIANGLE_FAN);
-	glVertex2f(pos->x, pos->y);
-	for(t = 0; t < M_PI; t += M_PI/72) {
-		glVertex2f(pos->x + sin(t) * r, pos->y + cos(t) * r);
+	glBegin(GL_LINE_LOOP);
+	r = fmax(r,1);
+	for(t = 0; t < M_PI*2; t += M_PI/72) {
+		glVertex2f(pos->x + sin(t) * r/250, pos->y + cos(t) * r/250);
 	}
 	glEnd();
 }
 
 void reshape (int width, int height) {
-	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+	//glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
 Body b[3] = {
-	{{0,0},{0,0},{0,0},1},
-	{{1,1},{0,0},{0,0},2},
-	{{-1,0},{0,0},{0,0},3}
+	{{0.001,0},{0,0},{0,0},100},
+	{{-1,0},{0.001,0.002},{0,0},0.001},
+	{{0,-0.5},{0.0015,0.0015},{0,0},0.001}
 };
+static const int bodies = 3;
 
 void display() {
 	int j;
@@ -94,14 +95,13 @@ void display() {
 	glClear (GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 
-	for(j = 0; j<3; ++j) {
+	for(j = 0; j<bodies; ++j) {
 		b[j].acceleration = move(&(b[j]),b,3,j);
 	}
-	for(j = 0; j<3; ++j) {
+	for(j = 0; j<bodies; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-
-		circle(&(b[j].position),b[j].mass);
+		circle(&(b[j].position),sqrt(b[j].mass));
 	}
 	glFlush();
 }
@@ -114,6 +114,7 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Yay physics");
 
 	glutDisplayFunc(display);
+	glutIdleFunc(display);
 	glutReshapeFunc(reshape);
 
 	glutMainLoop();
