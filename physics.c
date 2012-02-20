@@ -16,16 +16,25 @@ typedef struct {
 double newt(double m, , double r) {
 	return G*m/(r*r);
 }
-double d(double x1, double x2, double y1, double y2) {
-	double dx = x1-x2,
-	dy = y1-y2;
-	return sqrt(dx*dx+dy*dy);
+Vector vplus(Vector *a, Vector *b) {
+	Vector out = {a->x + b->x, a->y + b->y};
+	return out;
 }
-double unitx(double x1, double x2, double y1, double y2) {
-	return (x2-x1)/d(x1,x2,y1,y2);
+Vector vminus(Vector *a, Vector *b) {
+	Vector out = {a->x - b->x, a->y - b->y};
+	return out;
 }
-double unity(double x1, double x2, double y1, double y2) {
-	return (y2-y1)/d(x1,x2,y1,y2);
+double norm(Vector *a) {
+	return sqrt(a->x * a->x + a->y * a->y);
+}
+double distance(Vector *a, Vector *b) {
+	Vector d = vminus(a,b);
+	return norm(d);
+}
+Vector unit(Vector *a) {
+	double n = norm(a);
+	Vector out = {(a->x)/n,(a->y)/n};
+	return out;
 }
 void move(Body* thing, Body* rest, int l) {
 	int i;
@@ -44,10 +53,10 @@ void move(Body* thing, Body* rest, int l) {
 
 int main(int argc, char **argv) {
 	int i;
-	Body a = {0,0,1};
+	Body a = {{0,0},{0,0},1};
 	Body other[2] = {
-		{1,1,2},
-		{-1,0,3}
+		{{1,1},{0,0},2},
+		{{-1,0},{0,0},3}
 	};
 	for(i = 0; i<100000; ++i) {
 		move(&a,other,2);
