@@ -5,7 +5,7 @@
 typedef struct {
 	double x;
 	double y;
-} Vector
+} Vector;
 
 typedef struct {
 	Vector position;
@@ -13,7 +13,7 @@ typedef struct {
 	double mass;
 } Body;
 
-double newt(double m, , double r) {
+double newt(double m, double r) {
 	return G*m/(r*r);
 }
 Vector vplus(Vector *a, Vector *b) {
@@ -28,12 +28,15 @@ Vector smult(double l, Vector *a) {
 	Vector out = {(a->x)*l, (a->y)*l};
 	return out;
 }
+void print(Vector *a) {
+	printf("(%f,%f)\n",a->x,a->y);
+}
 double norm(Vector *a) {
 	return sqrt(a->x * a->x + a->y * a->y);
 }
 double distance(Vector *a, Vector *b) {
 	Vector d = vminus(a,b);
-	return norm(d);
+	return norm(&d);
 }
 Vector unit(Vector *a) {
 	double n = norm(a);
@@ -43,13 +46,16 @@ Vector unit(Vector *a) {
 void move(Body* thing, Body* rest, int l) {
 	int i;
 	double n, r;
-	Vector ds = {0,0};
+	Vector ds = {0,0}, diff, u ,m;
 	Body b;
 	for(i=0; i<l; ++i) {
 		b = rest[i];
-		r = distance(thing->position,b.position);
+		r = distance(&(thing->position),&(b.position));
 		n = newt(rest[i].mass,r);
-		ds = vplus(ds,smult(l,unit(vminus(b.position,thing->position))));
+		diff = vminus(&(b.position),&(thing->position));
+		u = unit(&diff);
+		m = smult(l,&u);
+		ds = vplus(&ds,&m);
 	}
 	thing->position = vplus(&(thing->position),&ds);
 }
