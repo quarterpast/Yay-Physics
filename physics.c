@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
+#include <stdlib.h>
 #include <GL/glut.h>
 #define G 1e-8
 #define WIDTH 750
@@ -29,6 +31,7 @@ typedef struct {
 	Vector acceleration;
 	double mass;
 	Path path;
+	Colour colour;
 } Body;
 
 double newt(double m, double r) {
@@ -90,10 +93,11 @@ Vector coordToScreen(Vector *pos) {
 	return out;
 }
 
-void circle(Vector *pos, double r) {
+void circle(Vector *pos, double r, Colour c) {
 	double t;
 	Vector sc = coordToScreen(pos);
 	glBegin(GL_TRIANGLE_FAN);
+	glColor3f(c.r,c.g,c.b);
 	glVertex2f(sc.x,sc.y);
 	r = fmax(r,2);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
@@ -147,6 +151,14 @@ void traverse(
 	end(b);
 }
 
+Colour randColour() {
+	double r = 1-0.5*(double)rand()/(double)RAND_MAX,
+	g = 1-0.5*(double)rand()/(double)RAND_MAX,
+	b = 1-0.5*(double)rand()/(double)RAND_MAX;
+	Colour out = {r,g,b};
+	return out;
+}
+
 Body newBody(Vector pos, Vector vel, double mass) {
 	Vector *arr = malloc(PATHLEN*sizeof(Vector));
 	int i;
@@ -159,7 +171,8 @@ Body newBody(Vector pos, Vector vel, double mass) {
 		vel,
 		{0,0},
 		mass,
-		path
+		path,
+		randColour()
 	};
 
 	return out;
@@ -190,7 +203,7 @@ void step() {
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 		b[j].path.pos = (b[j].path.pos + 1) % PATHLEN;
 		b[j].path.point[b[j].path.pos] = b[j].position;
-		circle(&(b[j].position),sqrt(b[j].mass));
+		circle(&(b[j].position),sqrt(b[j].mass),b[j].colour);
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
 	glutSwapBuffers();
@@ -203,6 +216,7 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
 
+	srand(time(NULL));
 
 	b[0] = newBody(newVector(0,0.00001),newVector(0,0),100);
 	b[1] = newBody(newVector(1,0),newVector(0,0.001),1);
