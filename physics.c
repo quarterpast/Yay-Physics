@@ -94,7 +94,7 @@ void keyPressed (unsigned char key, int x, int y) {
 		glutFullScreenToggle();
 	}
 	if(key == '\x1e') {
-		glutLeaveFullScreen();
+		// glutLeaveFullScreen();
 	}
 }
 
