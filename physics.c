@@ -67,12 +67,12 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 	return ds;
 }
 
-void circle(double x, double y, double r) {
+void circle(Vector &pos, double r) {
 	double t;
 	glBegin(GL_TRIANGLE_FAN);
-	glVertex2f(x, y);
+	glVertex2f(pos->x, pos->y);
 	for(t = 0; t < M_PI; t += M_PI/72) {
-		glVertex2f(x + sin(t) * r, y + cos(t) * r);
+		glVertex2f(pos->x + sin(t) * r, pos->y + cos(t) * r);
 	}
 	glEnd();
 }
@@ -81,7 +81,15 @@ void reshape (int width, int height) {
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 }
 
+Body b[3] = {
+	{{0,0},{0,0},{0,0},1},
+	{{1,1},{0,0},{0,0},2},
+	{{-1,0},{0,0},{0,0},3}
+};
+
 void display() {
+	int j;
+
 	glClearColor(0,0,0,1);
 	glClear (GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
@@ -92,19 +100,13 @@ void display() {
 	for(j = 0; j<3; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+
+		circle(&(b[j].position),b[j].mass);
 	}
 	glFlush();
 }
 
 int main(int argc, char **argv) {
-	int i,j;
-
-	Body b[3] = {
-		{{0,0},{0,0},{0,0},1},
-		{{1,1},{0,0},{0,0},2},
-		{{-1,0},{0,0},{0,0},3}
-	};
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_SINGLE);
 	glutInitWindowSize (500, 500);
