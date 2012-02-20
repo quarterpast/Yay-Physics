@@ -46,24 +46,21 @@ Vector unit(Vector *a) {
 	Vector out = {(a->x)/n,(a->y)/n};
 	return out;
 }
-Vector move(Body* thing, Body* rest, int l) {
+Vector move(Body* thing, Body* rest, int l, int skip) {
 	int i;
 	double n, r;
 	Vector ds = {0,0}, diff, u ,m;
 	Body b;
 	for(i=0; i<l; ++i) {
+		if(i == skip) continue;
 		b = rest[i];
 		r = distance(&(thing->position),&(b.position));
 		n = newt(rest[i].mass,r);
 		diff = vminus(&(b.position),&(thing->position));
 
-		vprint(&(diff),"dif ");
 		u = unit(&diff);
-		vprint(&(u),"unt ");
 		m = smult(n,&u);
-		vprint(&(m),"mul ");
 		ds = vplus(&ds,&m);
-		vprint(&(ds),"add ");
 	}
 	return ds;
 }
@@ -82,8 +79,7 @@ int main(int argc, char **argv) {
 	};
 	for(i = 0; i<1000; ++i) {
 		for(j = 0; j<3; ++j) {
-			vprint(&(b[j].position),"pos ");
-			ds[j] = move(&(b[j]),b,3);
+			ds[j] = move(&(b[j]),b,3,j);
 		}
 		for(j = 0; j<3; ++j) {
 			b[j].position = vplus(&(b[j].position),&ds[j]);
