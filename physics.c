@@ -120,6 +120,14 @@ void keyPressed (unsigned char key, int x, int y) {
 	}
 }
 
+Colour fade(Colour *c,int i) {
+	Colour out = {
+		c->r * i/PATHLEN,
+		c->g * i/PATHLEN,
+		c->b * i/PATHLEN
+	};
+	return out;
+}
 void reshape (int w, int h) {
 	width = w;
 	height = h;
@@ -128,8 +136,10 @@ void reshape (int w, int h) {
 void startPath(Body *b) {
 	glBegin(GL_LINE_STRIP);
 }
-void drawPath(Body *b,Vector *pos) {
+void drawPath(Body *b,Vector *pos,int i) {
 	Vector px = coordToScreen(pos);
+	Colour faded = fade(&(b->colour),i);
+	glColour(&faded);
 	glVertex2f(px.x,px.y);
 }
 void endPath(Body *b) {
@@ -139,7 +149,7 @@ void endPath(Body *b) {
 void traverse(
 	Body *b,
 	void (*start)(Body*),
-	void (*cb)(Body*,Vector*),
+	void (*cb)(Body*,Vector*,int),
 	void (*end)(Body*)
 ) {
 	int i,j;
@@ -149,17 +159,9 @@ void traverse(
 		if(j > PATHLEN) {
 			j -= PATHLEN;
 		}
-		cb(b,&(b->path.point[j]));
+		cb(b,&(b->path.point[j]),i);
 	}
 	end(b);
-}
-Colour fade(Colour *c,int i) {
-	Colour out = {
-		c->r * i/PATHLEN,
-		c->g * i/PATHLEN,
-		c->b * i/PATHLEN
-	}
-	return out;
 }
 Colour randColour() {
 	double r = 1-0.5*(double)rand()/(double)RAND_MAX,
