@@ -71,13 +71,19 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 int width = WIDTH;
 int height = HEIGHT;
 
+Vector coordToScreen(Vector *pos) {
+	Vector out = {pos->x*WIDTH/width,pos->y*HEIGHT/height};
+	return out;
+}
+
 void circle(Vector *pos, double r) {
 	double t;
+	Vector sc = coordToScreen(pos);
 	glBegin(GL_TRIANGLE_FAN);
-	glVertex2f(pos->x,pos->y);
+	glVertex2f(sc.x,sc.y);
 	r = fmax(r,1);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
-		glVertex2f(pos->x*WIDTH/width + sin(t) * r/width, pos->y*HEIGHT/height + cos(t) * r/height);
+		glVertex2f(sc.x+sin(t)*r/width, sc.y+cos(t)*r/height);
 	}
 	glEnd();
 }
