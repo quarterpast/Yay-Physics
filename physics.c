@@ -160,8 +160,10 @@ Colour randColour() {
 
 Body newBody(Vector pos, Vector vel, double mass) {
 	Vector *arr = malloc(PATHLEN*sizeof(Vector));
-	arr[0] = pos;
 	int i;
+	for(i = 0; i<PATHLEN; i++) {
+		arr[i] = pos;
+	}
 	Path path = {
 		arr,
 		0
@@ -201,11 +203,9 @@ void step() {
 	for(j = 0; j<bodies; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+		b[j].path.pos++;
 		if(b[j].path.pos >= PATHLEN) {
-			b[j].path.pos = b[j].path.pos + 1 - PATHLEN;
-		}
-		else {
-			b[j].path.pos++;
+			b[j].path.pos = b[j].path.pos - PATHLEN;
 		}
 		b[j].path.point[b[j].path.pos] = b[j].position;
 		circle(&(b[j].position),sqrt(b[j].mass),b[j].colour);
