@@ -85,6 +85,14 @@ void display() {
 	glClearColor(0,0,0,1);
 	glClear (GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
+
+	for(j = 0; j<3; ++j) {
+		b[j].acceleration = move(&(b[j]),b,3,j);
+	}
+	for(j = 0; j<3; ++j) {
+		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
+		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+	}
 	glFlush();
 }
 
@@ -107,14 +115,4 @@ int main(int argc, char **argv) {
 	glutReshapeFunc(reshape);
 
 	glutMainLoop();
-
-/*	for(i = 0; i<1000; ++i) {
-		for(j = 0; j<3; ++j) {
-			b[j].acceleration = move(&(b[j]),b,3,j);
-		}
-		for(j = 0; j<3; ++j) {
-			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
-			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-		}
-	}*/
 }
