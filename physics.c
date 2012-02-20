@@ -4,6 +4,7 @@
 #define G 1e-7
 #define WIDTH 750
 #define HEIGHT 750
+#define TIMERMSECS 1000/60
 
 typedef struct {
 	double x;
@@ -81,7 +82,7 @@ void circle(Vector *pos, double r) {
 	Vector sc = coordToScreen(pos);
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex2f(sc.x,sc.y);
-	r = fmax(r,1);
+	r = fmax(r,2);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
 		glVertex2f(sc.x+sin(t)*r/width, sc.y+cos(t)*r/height);
 	}
@@ -105,24 +106,25 @@ void reshape (int w, int h) {
 }
 
 Body b[6] = {
-	{{0.001,0},{0,0},{0,0},100},
-	{{1,0},{0.002,0.001},{0,0},100},
-	{{0,-0.5},{0.0015,0.0015},{0,0},100},
-	{{-1,0},{0,-0.0015},{0,0},100},
-	{{0,0.7},{0.005,0},{0,0},100},
-	{{-0.5,-0.5},{0,0.0015},{0,0},100}
+	{{0,0},{0,0},{0,0},1000},
+	{{0.5,0},{0,0.004},{0,0},0.001},
+	{{-0.2,0},{0,0.008},{0,0},0.01},
+	{{0,-0.2},{0.008,0},{0,0},0.01},
+	{{0.2,0.2},{0,0.004},{0,0},0.01},
+	{{-0.2,-0.4},{0.002,0.004},{0,0},1}
 };
 static const int bodies = 6;
 
-void display() {
+void step() {
 	int j;
+	glutTimerFunc(TIMERMSECS, step, 0);
 
 	glClearColor(0,0,0,1);
 	glClear (GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 
 	for(j = 0; j<bodies; ++j) {
-		b[j].acceleration = move(&(b[j]),b,3,j);
+		b[j].acceleration = move(&(b[j]),b,bodies,j);
 	}
 	for(j = 0; j<bodies; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
@@ -139,8 +141,8 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
 
-	glutDisplayFunc(display);
-	glutIdleFunc(display);
+	//glutDisplayFunc(display);
+	glutTimerFunc(TIMERMSECS, step, 0);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
