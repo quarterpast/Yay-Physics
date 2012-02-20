@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <GL/glut.h>
-#define G 1e-7
+#define G 1e-8
 #define WIDTH 750
 #define HEIGHT 750
 #define TIMERMSECS 1000/60
@@ -16,7 +16,14 @@ typedef struct {
 	Vector velocity;
 	Vector acceleration;
 	double mass;
+	Path first;
 } Body;
+
+typedef struct {
+	Vector pos;
+	Path *next;
+	Path *prev;
+} Path
 
 double newt(double m, double r) {
 	return G*m/(r*r);
