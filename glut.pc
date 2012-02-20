@@ -1,0 +1,11 @@
+prefix=/usr/include
+exec_prefix=${prefix}
+libdir=/usr/include/GL
+includedir=/usr/include
+
+Name: glut
+Description: Mesa OpenGL Utility Toolkit library
+Requires: gl glu
+Version: 7.6.0
+Libs: -L${libdir} -lglut
+Cflags: -I${includedir}
