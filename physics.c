@@ -224,17 +224,15 @@ void step() {
 	glClearColor(0,0,0,1);
 	glLoadIdentity();
 
-	for(k = 0; k<(int)steps; k++) {
-		for(j = 0; j<bodies; ++j) {
-			b[j].acceleration = move(&(b[j]),b,bodies,j);
-		}
-		for(j = 0; j<bodies; ++j) {
-			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
-			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-			b[j].path.pos++;
-			PATH_MOD(b[j].path.pos);
-			b[j].path.point[b[j].path.pos] = b[j].position;
-		}
+	for(j = 0; j<bodies; ++j) {
+		b[j].acceleration = move(&(b[j]),b,bodies,j);
+	}
+	for(j = 0; j<bodies; ++j) {
+		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
+		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+		b[j].path.pos++;
+		PATH_MOD(b[j].path.pos);
+		b[j].path.point[b[j].path.pos] = b[j].position;
 	}
 	for(j = 0; j<bodies; ++j) {
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
