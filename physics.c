@@ -78,10 +78,11 @@ int main(int argc, char **argv) {
 
 	for(i = 0; i<1000; ++i) {
 		for(j = 0; j<3; ++j) {
-			ds[j] = move(&(b[j]),b,3,j);
+			b[j].acceleration = move(&(b[j]),b,3,j);
 		}
 		for(j = 0; j<3; ++j) {
-			b[j].position = vplus(&(b[j].position),&ds[j]);
+			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
+			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 		}
 		vprint(&(b[0].position),"");
 	}
