@@ -205,7 +205,7 @@ void step() {
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 		b[j].path.pos++;
 		if(b[j].path.pos >= PATHLEN) {
-			b[j].path.pos = b[j].path.pos - PATHLEN;
+			b[j].path.pos -= PATHLEN;
 		}
 		b[j].path.point[b[j].path.pos] = b[j].position;
 		circle(&(b[j].position),sqrt(b[j].mass),b[j].colour);
