@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <GL/glut.h>
-#define G 2e-8
+#define G 1e-7
 
 typedef struct {
 	double x;
@@ -66,27 +66,34 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 	}
 	return ds;
 }
+int width = 768;
+int height = 768;
 
 void circle(Vector *pos, double r) {
 	double t;
 	glBegin(GL_LINE_LOOP);
 	r = fmax(r,1);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
-		glVertex2f(pos->x + sin(t) * r/250, pos->y + cos(t) * r/250);
+		glVertex2f(pos->x + sin(t) * r/width, pos->y + cos(t) * r/height);
 	}
 	glEnd();
 }
 
-void reshape (int width, int height) {
-	//glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+void reshape (int w, int h) {
+	width = w;
+	height = h;
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
 
-Body b[3] = {
+Body b[6] = {
 	{{0.001,0},{0,0},{0,0},100},
-	{{-1,0},{0.001,0.002},{0,0},0.001},
-	{{0,-0.5},{0.0015,0.0015},{0,0},0.001}
+	{{1,0},{0.002,0.001},{0,0},100},
+	{{0,-0.5},{0.0015,0.0015},{0,0},100},
+	{{-1,0},{0,-0.0015},{0,0},100},
+	{{0,0.7},{0.005,0},{0,0},100},
+	{{-0.5,-0.5},{0,0.0015},{0,0},100}
 };
-static const int bodies = 3;
+static const int bodies = 6;
 
 void display() {
 	int j;
@@ -109,8 +116,8 @@ void display() {
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE);
-	glutInitWindowSize (500, 500);
-	glutInitWindowPosition (100, 100);
+	glutInitWindowSize (width, height);
+	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
 
 	glutDisplayFunc(display);
