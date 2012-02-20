@@ -8,6 +8,7 @@
 #define HEIGHT 750
 #define TIMERMSECS 1000/60
 #define PATHLEN 1024
+#define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
 typedef struct {
 	double r;
@@ -115,6 +116,9 @@ void keyPressed (unsigned char key, int x, int y) {
 	if(key == 'f') {
 		glutFullScreenToggle();
 	}
+	if(key == 'q') {
+		glutLeaveMainLoop();
+	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
 	}
@@ -156,9 +160,7 @@ void traverse(
 	start(b);
 	for(i = 1; i<PATHLEN; i++) {
 		j = i+b->path.pos;
-		if(j > PATHLEN) {
-			j -= PATHLEN;
-		}
+		PATH_MOD(j);
 		cb(b,&(b->path.point[j]),i);
 	}
 	end(b);
@@ -216,9 +218,7 @@ void step() {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 		b[j].path.pos++;
-		if(b[j].path.pos >= PATHLEN) {
-			b[j].path.pos -= PATHLEN;
-		}
+		PATH_MOD(b[j].path.pos);
 		b[j].path.point[b[j].path.pos] = b[j].position;
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
 		traverse(&(b[j]),startPath,drawPath,endPath);
