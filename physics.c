@@ -8,6 +8,12 @@
 #define PATHLEN 500
 
 typedef struct {
+	double r;
+	double g;
+	double b;
+} Colour;
+
+typedef struct {
 	double x;
 	double y;
 } Vector;
