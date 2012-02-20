@@ -94,11 +94,15 @@ Vector coordToScreen(Vector *pos) {
 	return out;
 }
 
-void circle(Vector *pos, double r, Colour c) {
+void glColour(Colour *c) {
+	glColor3f(c->r,c->g,c->b);
+}
+
+void circle(Vector *pos, double r, Colour *c) {
 	double t;
 	Vector sc = coordToScreen(pos);
 	glBegin(GL_TRIANGLE_FAN);
-	glColor3f(c.r,c.g,c.b);
+	glColour(c);
 	glVertex2f(sc.x,sc.y);
 	r = fmax(r,2);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
@@ -120,6 +124,14 @@ void keyPressed (unsigned char key, int x, int y) {
 	}
 }
 
+Colour fade(Colour *c,int i) {
+	Colour out = {
+		c->r * i/PATHLEN,
+		c->g * i/PATHLEN,
+		c->b * i/PATHLEN
+	};
+	return out;
+}
 void reshape (int w, int h) {
 	width = w;
 	height = h;
@@ -128,8 +140,10 @@ void reshape (int w, int h) {
 void startPath(Body *b) {
 	glBegin(GL_LINE_STRIP);
 }
-void drawPath(Body *b,Vector *pos) {
+void drawPath(Body *b,Vector *pos,int i) {
 	Vector px = coordToScreen(pos);
+	Colour faded = fade(&(b->colour),i);
+	glColour(&faded);
 	glVertex2f(px.x,px.y);
 }
 void endPath(Body *b) {
@@ -139,7 +153,7 @@ void endPath(Body *b) {
 void traverse(
 	Body *b,
 	void (*start)(Body*),
-	void (*cb)(Body*,Vector*),
+	void (*cb)(Body*,Vector*,int),
 	void (*end)(Body*)
 ) {
 	int i,j;
@@ -147,11 +161,10 @@ void traverse(
 	for(i = 1; i<PATHLEN; i++) {
 		j = i+b->path.pos;
 		PATH_MOD(j);
-		cb(b,&(b->path.point[j]));
+		cb(b,&(b->path.point[j]),i);
 	}
 	end(b);
 }
-
 Colour randColour() {
 	double r = 1-0.5*(double)rand()/(double)RAND_MAX,
 	g = 1-0.5*(double)rand()/(double)RAND_MAX,
@@ -159,7 +172,6 @@ Colour randColour() {
 	Colour out = {r,g,b};
 	return out;
 }
-
 Body newBody(Vector pos, Vector vel, double mass) {
 	Vector *arr = malloc(PATHLEN*sizeof(Vector));
 	int i;
@@ -195,8 +207,8 @@ void step() {
 	int j;
 	glutTimerFunc(TIMERMSECS, step, 0);
 
-	glClearColor(0,0,0,1);
 	glClear (GL_COLOR_BUFFER_BIT);
+	glClearColor(0,0,0,1);
 	glLoadIdentity();
 
 	for(j = 0; j<bodies; ++j) {
@@ -208,7 +220,7 @@ void step() {
 		b[j].path.pos++;
 		PATH_MOD(b[j].path.pos);
 		b[j].path.point[b[j].path.pos] = b[j].position;
-		circle(&(b[j].position),sqrt(b[j].mass),b[j].colour);
+		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
 	glutSwapBuffers();
