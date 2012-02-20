@@ -12,7 +12,7 @@
 #define PATHLEN 10000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
-double timeStep = 16.0;
+double timeStep = 2;
 
 typedef struct {
 	double r;
@@ -59,6 +59,7 @@ void vprint(Vector *a,char *str) {
 	printf("%s(%f,%f)\n",str,a->x,a->y);
 }
 double norm(Vector *a) {
+	//return fabs(a->x)+fabs(a->y); TAXICAB
 	return sqrt(a->x * a->x + a->y * a->y);
 }
 double distance(Vector *a, Vector *b) {
@@ -124,11 +125,12 @@ void keyPressed (unsigned char key, int x, int y) {
 	if(key == 'q') {
 		glutLeaveMainLoop();
 	}
-	if(key == '-') {
+	if(key == '+') {
 		timeStep *= STEP;
 	}
-	if(key == '+') {
+	if(key == '-') {
 		timeStep /= STEP;
+		if(timeStep < 1) timeStep = 1;
 	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
@@ -224,15 +226,17 @@ void display() {
 	glClear (GL_COLOR_BUFFER_BIT);
 	glClearColor(0,0,0,1);
 	glLoadIdentity();
-	for(j = 0; j<bodies; ++j) {
-		b[j].acceleration = move(&(b[j]),b,bodies,j);
-	}
-	for(j = 0; j<bodies; ++j) {
-		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
-		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-		b[j].path.pos++;
-		PATH_MOD(b[j].path.pos);
-		b[j].path.point[b[j].path.pos] = b[j].position;
+	for(k = 0; k<(int) timeStep; k++) {
+		for(j = 0; j<bodies; ++j) {
+			b[j].acceleration = move(&(b[j]),b,bodies,j);
+		}
+		for(j = 0; j<bodies; ++j) {
+			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
+			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+			b[j].path.pos++;
+			PATH_MOD(b[j].path.pos);
+			b[j].path.point[b[j].path.pos] = b[j].position;
+		}
 	}
 	for(j = 0; j<bodies; ++j) {
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
