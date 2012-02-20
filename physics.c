@@ -103,12 +103,12 @@ void display() {
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 		circle(&(b[j].position),sqrt(b[j].mass));
 	}
-	glFlush();
+	glutSwapBuffers();
 }
 
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_SINGLE);
+	glutInitDisplayMode (GLUT_DOUBLE);
 	glutInitWindowSize (500, 500);
 	glutInitWindowPosition (100, 100);
 	glutCreateWindow("Yay physics");
