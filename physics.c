@@ -8,8 +8,11 @@
 #define WIDTH 750
 #define HEIGHT 750
 #define TIMERMSECS 1000/60
-#define PATHLEN 100
+#define STEP 1.2
+#define PATHLEN 10000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
+
+double steps = 2.0;
 
 typedef struct {
 	double r;
@@ -121,6 +124,13 @@ void keyPressed (unsigned char key, int x, int y) {
 	if(key == 'q') {
 		glutLeaveMainLoop();
 	}
+	if(key == '+') {
+		steps *= STEP;
+	}
+	if(key == '-') {
+		steps /= STEP;
+		if(steps <= 1) steps = 1;
+	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
 	}
@@ -208,22 +218,26 @@ Body b[4] = {};
 static const int bodies = 4;
 
 void step() {
-	int j;
+	int j,k;
 	glutTimerFunc(TIMERMSECS, step, 0);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 	glClearColor(0,0,0,1);
 	glLoadIdentity();
 
-	for(j = 0; j<bodies; ++j) {
-		b[j].acceleration = move(&(b[j]),b,bodies,j);
+	for(k = 0; k<(int)steps; k++) {
+		for(j = 0; j<bodies; ++j) {
+			b[j].acceleration = move(&(b[j]),b,bodies,j);
+		}
+		for(j = 0; j<bodies; ++j) {
+			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
+			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+			b[j].path.pos++;
+			PATH_MOD(b[j].path.pos);
+			b[j].path.point[b[j].path.pos] = b[j].position;
+		}
 	}
 	for(j = 0; j<bodies; ++j) {
-		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
-		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-		b[j].path.pos++;
-		PATH_MOD(b[j].path.pos);
-		b[j].path.point[b[j].path.pos] = b[j].position;
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
@@ -243,10 +257,10 @@ int main(int argc, char **argv) {
 
 	srand(time(NULL));
 
-	b[0] = newBody(newVector(0,0.00001),newVector(0,0),100);
-	b[1] = newBody(newVector(1,0),newVector(0,0.001),1);
-	b[2] = newBody(newVector(-0.7,0),newVector(0,0.0005),1);
-	b[3] = newBody(newVector(0,0.5),newVector(0.001,0.001),1);
+	b[0] = newBody(newVector(0,.5),newVector(0.0002,0),200);
+	b[1] = newBody(newVector(.5,0),newVector(0,-0.0004),10);
+	b[2] = newBody(newVector(-.5,0),newVector(0,0.0004),10);
+	b[3] = newBody(newVector(0,-.5),newVector(-0.0002,0),200);
 
 	//glutDisplayFunc(display);
 	glutTimerFunc(TIMERMSECS, step, 0);
