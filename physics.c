@@ -40,6 +40,9 @@ double distance(Vector *a, Vector *b) {
 }
 Vector unit(Vector *a) {
 	double n = norm(a);
+	if(n == 0) {
+		n = 1;
+	}
 	Vector out = {(a->x)/n,(a->y)/n};
 	return out;
 }
@@ -53,11 +56,15 @@ Vector move(Body* thing, Body* rest, int l) {
 		r = distance(&(thing->position),&(b.position));
 		n = newt(rest[i].mass,r);
 		diff = vminus(&(b.position),&(thing->position));
+
+		vprint(&(diff),"dif ");
 		u = unit(&diff);
+		vprint(&(u),"unt ");
 		m = smult(n,&u);
+		vprint(&(m),"mul ");
 		ds = vplus(&ds,&m);
+		vprint(&(ds),"add ");
 	}
-	vprint(&ds,"mv ");
 	return ds;
 }
 
@@ -75,12 +82,12 @@ int main(int argc, char **argv) {
 	};
 	for(i = 0; i<1000; ++i) {
 		for(j = 0; j<3; ++j) {
+			vprint(&(b[j].position),"pos ");
 			ds[j] = move(&(b[j]),b,3);
-			vprint(&(ds[j]),"ds ");
 		}
 		for(j = 0; j<3; ++j) {
 			b[j].position = vplus(&(b[j].position),&ds[j]);
 		}
-		print(&(b[0].position),"");
+		//vprint(&(b[0].position),"");
 	}
 }
