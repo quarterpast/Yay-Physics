@@ -7,13 +7,14 @@
 #define WIDTH 750
 #define HEIGHT 750
 #define TIMERMSECS 1000/60
-#define PATHLEN 1024
+#define PATHLEN 100
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
 typedef struct {
 	double r;
 	double g;
 	double b;
+	double a;
 } Colour;
 
 typedef struct {
@@ -95,7 +96,7 @@ Vector coordToScreen(Vector *pos) {
 }
 
 void glColour(Colour *c) {
-	glColor3f(c->r,c->g,c->b);
+	glColor4f(c->r,c->g,c->b,c->a);
 }
 
 void circle(Vector *pos, double r, Colour *c) {
@@ -125,10 +126,12 @@ void keyPressed (unsigned char key, int x, int y) {
 }
 
 Colour fade(Colour *c,int i) {
+	printf("%f\n",c->a*(double)i/(double)PATHLEN);
 	Colour out = {
-		c->r * i/PATHLEN,
-		c->g * i/PATHLEN,
-		c->b * i/PATHLEN
+		c->r,
+		c->g,
+		c->b,
+		c->a*(double)i/(double)PATHLEN
 	};
 	return out;
 }
@@ -168,8 +171,9 @@ void traverse(
 Colour randColour() {
 	double r = 1-0.5*(double)rand()/(double)RAND_MAX,
 	g = 1-0.5*(double)rand()/(double)RAND_MAX,
-	b = 1-0.5*(double)rand()/(double)RAND_MAX;
-	Colour out = {r,g,b};
+	b = 1-0.5*(double)rand()/(double)RAND_MAX,
+	a = 1;
+	Colour out = {r,g,b,a};
 	return out;
 }
 Body newBody(Vector pos, Vector vel, double mass) {
