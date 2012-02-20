@@ -12,7 +12,7 @@ typedef struct {
 } Vector;
 
 typedef struct node {
-	Vector pos;
+	Vector *pos;
 	struct node *next;
 	struct node *prev;
 } Path;
@@ -22,6 +22,7 @@ typedef struct {
 	Vector velocity;
 	Vector acceleration;
 	double mass;
+	Path path;
 	Path first;
 } Body;
 
@@ -112,6 +113,13 @@ void reshape (int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
 
+void traverse(Body *b, void (*cb)(Vector*)) {
+	Path *node;
+	for(node = &(b->first); node->next != NULL; node = node->next) {
+		cb(node->pos);
+	}
+}
+
 Body newBody(Vector pos, Vector vel, double mass) {
 	Body out = {
 		pos,
@@ -119,7 +127,12 @@ Body newBody(Vector pos, Vector vel, double mass) {
 		{0,0},
 		mass,
 		{
-			pos,
+			&pos,
+			NULL,
+			NULL
+		},
+		{
+			&pos,
 			NULL,
 			NULL
 		}
@@ -151,6 +164,9 @@ void step() {
 	for(j = 0; j<bodies; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+		Path node = {&(b[j].position),NULL,&(b[j].path)};
+		b[j].path.next = &node;
+		b[j].path = node;
 		circle(&(b[j].position),sqrt(b[j].mass));
 	}
 	glutSwapBuffers();
