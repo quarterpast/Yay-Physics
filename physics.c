@@ -153,7 +153,14 @@ void traverse(
 	}
 	end(b);
 }
-
+Colour fade(Colour *c,int i) {
+	Colour out = {
+		c->r * i/PATHLEN,
+		c->g * i/PATHLEN,
+		c->b * i/PATHLEN
+	}
+	return out;
+}
 Colour randColour() {
 	double r = 1-0.5*(double)rand()/(double)RAND_MAX,
 	g = 1-0.5*(double)rand()/(double)RAND_MAX,
@@ -196,8 +203,8 @@ void step() {
 	int j;
 	glutTimerFunc(TIMERMSECS, step, 0);
 
-	glClearColor(0,0,0,1);
 	glClear (GL_COLOR_BUFFER_BIT);
+	glClearColor(0,0,0,1);
 	glLoadIdentity();
 
 	for(j = 0; j<bodies; ++j) {
