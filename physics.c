@@ -43,7 +43,7 @@ Vector unit(Vector *a) {
 	Vector out = {(a->x)/n,(a->y)/n};
 	return out;
 }
-void move(Body* thing, Body* rest, int l) {
+Vector move(Body* thing, Body* rest, int l) {
 	int i;
 	double n, r;
 	Vector ds = {0,0}, diff, u ,m;
@@ -57,18 +57,18 @@ void move(Body* thing, Body* rest, int l) {
 		m = smult(n,&u);
 		ds = vplus(&ds,&m);
 	}
-	thing->position = vplus(&(thing->position),&ds);
+	return vplus(&(thing->position),&ds);
 }
 
 int main(int argc, char **argv) {
 	int i;
-	Body a = {{0,0},{0,0},1};
-	Body other[2] = {
+	Body b[3] = {
+		{{0,0},{0,0},1},
 		{{1,1},{0,0},2},
 		{{-1,0},{0,0},3}
 	};
 	for(i = 0; i<1000; ++i) {
 		move(&a,other,2);
-		print(&(a.position));
+		print(&(a.position),"");
 	}
 }
