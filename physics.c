@@ -2,6 +2,8 @@
 #include <math.h>
 #include <GL/glut.h>
 #define G 1e-7
+#define WIDTH 750
+#define HEIGHT 750
 
 typedef struct {
 	double x;
@@ -66,15 +68,16 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 	}
 	return ds;
 }
-int width = 768;
-int height = 768;
+int width = WIDTH;
+int height = HEIGHT;
 
 void circle(Vector *pos, double r) {
 	double t;
-	glBegin(GL_LINE_LOOP);
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(pos->x,pos->y);
 	r = fmax(r,1);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
-		glVertex2f(pos->x*768/width + sin(t) * r/width, pos->y*768/height + cos(t) * r/height);
+		glVertex2f(pos->x*WIDTH/width + sin(t) * r/width, pos->y*HEIGHT/height + cos(t) * r/height);
 	}
 	glEnd();
 }
@@ -116,7 +119,7 @@ void display() {
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE);
-	glutInitWindowSize (width, height);
+	glutInitWindowSize (WIDTH, HEIGHT);
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
 
