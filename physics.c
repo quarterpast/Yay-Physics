@@ -24,6 +24,10 @@ Vector vminus(Vector *a, Vector *b) {
 	Vector out = {a->x - b->x, a->y - b->y};
 	return out;
 }
+Vector smult(double l, Vector *a) {
+	Vector out = {(a->x)*l, (a->y)*l};
+	return out;
+}
 double norm(Vector *a) {
 	return sqrt(a->x * a->x + a->y * a->y);
 }
@@ -38,17 +42,16 @@ Vector unit(Vector *a) {
 }
 void move(Body* thing, Body* rest, int l) {
 	int i;
-	double dx = 0,dy = 0, n, r;
+	double n, r;
+	Vector ds = {0,0};
 	Body b;
 	for(i=0; i<l; ++i) {
 		b = rest[i];
-		r = d(thing->x,b.x,thing->y,b.y);
-		n = newt(thing->mass,rest[i].mass,r);
-		dx += n*unitx(thing->x,b.x,thing->y,b.y);
-		dy += n*unity(thing->x,b.x,thing->y,b.y);
+		r = distance(thing->position,b.position);
+		n = newt(rest[i].mass,r);
+		ds = vplus(ds,smult(l,unit(vminus(b.position,thing->position))));
 	}
-	thing->x += dx;
-	thing->y += dy;
+	thing->position = vplus(&(thing->position),&ds);
 }
 
 int main(int argc, char **argv) {
