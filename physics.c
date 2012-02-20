@@ -69,6 +69,6 @@ int main(int argc, char **argv) {
 	};
 	for(i = 0; i<100000; ++i) {
 		move(&a,other,2);
-		printf("%f %f\n",a.x,a.y);
+		print(a.position);
 	}
 }
