@@ -130,7 +130,7 @@ void traverse(
 ) {
 	int i,j;
 	start(b);
-	for(i = 0; i<PATHLEN; ++i) {
+	for(i = 1; i<PATHLEN; i++) {
 		j = i+b->path.pos;
 		if(j > PATHLEN) {
 			j -= PATHLEN;
