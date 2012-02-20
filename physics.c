@@ -67,6 +67,8 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 	return ds;
 }
 
+void display() {}
+
 int main(int argc, char **argv) {
 	int i,j;
 
@@ -76,7 +78,17 @@ int main(int argc, char **argv) {
 		{{-1,0},{0,0},{0,0},3}
 	};
 
-	for(i = 0; i<1000; ++i) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode (GLUT_SINGLE);
+	glutInitWindowSize (500, 500);
+	glutInitWindowPosition (100, 100);
+	glutCreateWindow("Yay physics");
+
+	glutDisplayFunc(display);
+
+	glutMainLoop();
+
+/*	for(i = 0; i<1000; ++i) {
 		for(j = 0; j<3; ++j) {
 			b[j].acceleration = move(&(b[j]),b,3,j);
 		}
@@ -84,6 +96,5 @@ int main(int argc, char **argv) {
 			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 		}
-		vprint(&(b[0].position),"");
-	}
+	}*/
 }
