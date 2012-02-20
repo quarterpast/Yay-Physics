@@ -111,6 +111,9 @@ void keyPressed (unsigned char key, int x, int y) {
 	if(key == 'f') {
 		glutFullScreenToggle();
 	}
+	if(key == 'q') {
+		glutLeaveMainLoop();
+	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
 	}
@@ -142,7 +145,7 @@ void traverse(
 	start(b);
 	for(i = 1; i<PATHLEN; i++) {
 		j = i+b->path.pos;
-		if(j > PATHLEN) {
+		if(j >= PATHLEN) {
 			j -= PATHLEN;
 		}
 		cb(b,&(b->path.point[j]));
