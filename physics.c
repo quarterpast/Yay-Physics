@@ -219,7 +219,6 @@ static const int bodies = 4;
 
 void step() {
 	int j,k;
-	glutTimerFunc(TIMERMSECS, step, 0);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 	glClearColor(0,0,0,1);
@@ -251,10 +250,6 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
 
-	GLboolean out;
-	glGetBooleanv(GL_RGBA_MODE,&out);
-	printf("%d\n",out);
-
 	srand(time(NULL));
 
 	b[0] = newBody(newVector(0,.5),newVector(0.0002,0),200);
@@ -262,8 +257,8 @@ int main(int argc, char **argv) {
 	b[2] = newBody(newVector(-.5,0),newVector(0,0.0004),10);
 	b[3] = newBody(newVector(0,-.5),newVector(-0.0002,0),200);
 
-	//glutDisplayFunc(display);
-	glutTimerFunc(TIMERMSECS, step, 0);
+	glutDisplayFunc(step);
+	glutIdleFunc(step);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
