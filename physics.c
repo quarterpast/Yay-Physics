@@ -88,6 +88,16 @@ void circle(Vector *pos, double r) {
 	glEnd();
 }
 
+void keyPressed (unsigned char key, int x, int y) {
+	printf("%c\n",key);
+	if(key == 'f') {
+		glutFullScreenToggle();
+	}
+	if(key == '\x1e') {
+		glutLeaveFullScreen();
+	}
+}
+
 void reshape (int w, int h) {
 	width = w;
 	height = h;
@@ -131,6 +141,7 @@ int main(int argc, char **argv) {
 
 	glutDisplayFunc(display);
 	glutIdleFunc(display);
+	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
 	glutMainLoop();
