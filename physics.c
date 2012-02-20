@@ -12,7 +12,8 @@
 #define PATHLEN 10000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
-double timeStep = 16.0;
+
+double steps = 2.0;
 
 typedef struct {
 	double r;
@@ -117,18 +118,19 @@ void circle(Vector *pos, double r, Colour *c) {
 }
 
 void keyPressed (unsigned char key, int x, int y) {
-	//printf("%c\n",key);
+	printf("%c\n",key);
 	if(key == 'f') {
 		glutFullScreenToggle();
 	}
 	if(key == 'q') {
 		glutLeaveMainLoop();
 	}
-	if(key == '-') {
-		timeStep *= STEP;
-	}
 	if(key == '+') {
-		timeStep /= STEP;
+		steps *= STEP;
+	}
+	if(key == '-') {
+		steps /= STEP;
+		if(steps <= 1) steps = 1;
 	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
@@ -216,44 +218,31 @@ Body *b;
 
 int bodies;
 
-int startTime;
-int prevTime;
-
-void display() {
+void step() {
 	int j,k;
+	glutTimerFunc(TIMERMSECS, step, 0);
+
 	glClear (GL_COLOR_BUFFER_BIT);
 	glClearColor(0,0,0,1);
 	glLoadIdentity();
-	for(j = 0; j<bodies; ++j) {
-		b[j].acceleration = move(&(b[j]),b,bodies,j);
-	}
-	for(j = 0; j<bodies; ++j) {
-		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
-		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-		b[j].path.pos++;
-		PATH_MOD(b[j].path.pos);
-		b[j].path.point[b[j].path.pos] = b[j].position;
+
+	for(k = 0; k<(int)steps; k++) {
+		for(j = 0; j<bodies; ++j) {
+			b[j].acceleration = move(&(b[j]),b,bodies,j);
+		}
+		for(j = 0; j<bodies; ++j) {
+			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
+			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+			b[j].path.pos++;
+			PATH_MOD(b[j].path.pos);
+			b[j].path.point[b[j].path.pos] = b[j].position;
+		}
 	}
 	for(j = 0; j<bodies; ++j) {
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
 	glutSwapBuffers();
-}
-
-void step() {
-
-	glutTimerFunc(timeStep,step,0);
-	int currTime = glutGet(GLUT_ELAPSED_TIME);
-	int timeSincePrevFrame = currTime - prevTime;
-	int elapsedTime = currTime - startTime;
-
-	if(elapsedTime < timeStep) {
-		sleep(elapsedTime-timeStep);
-	}
-
-	display();
-	prevTime = currTime;
 }
 
 int main(int argc, char **argv) {
@@ -281,10 +270,13 @@ int main(int argc, char **argv) {
 		),10*(float)rand()/(float)RAND_MAX);
 	}
 
-	startTime = glutGet(GLUT_ELAPSED_TIME);
-	prevTime = startTime;
+	b[0] = newBody(newVector(0,.5),newVector(0.0002,0),200);
+	b[1] = newBody(newVector(.5,0),newVector(0,-0.0004),10);
+	b[2] = newBody(newVector(-.5,0),newVector(0,0.0004),10);
+	b[3] = newBody(newVector(0,-.5),newVector(-0.0002,0),200);
 
-	glutTimerFunc(timeStep,step,0);
+	//glutDisplayFunc(display);
+	glutTimerFunc(TIMERMSECS, step, 0);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
