@@ -1,6 +1,4 @@
 all: physics
 
-physics: physics.o
-
-physics.o: physics.c
-
+physics: physics.c
+	gcc -lm `pkg-config --cflags --libs glut` -o physics physics.c

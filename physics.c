@@ -67,7 +67,26 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 	return ds;
 }
 
-void display() {}
+void circle(double x, double y, double r) {
+	double t;
+	glBegin(GL_TRIANGLE_FAN);
+	glVertex2f(x, y);
+	for(t = 0; t < M_PI; t += M_PI/72) {
+		glVertex2f(x + sin(t) * r, y + cos(t) * r);
+	}
+	glEnd();
+}
+
+void reshape (int width, int height) {
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+}
+
+void display() {
+	glClearColor(0,0,0,1);
+	glClear (GL_COLOR_BUFFER_BIT);
+	glLoadIdentity();
+	glFlush();
+}
 
 int main(int argc, char **argv) {
 	int i,j;
@@ -85,6 +104,7 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Yay physics");
 
 	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
 
 	glutMainLoop();
 
