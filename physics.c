@@ -57,18 +57,28 @@ Vector move(Body* thing, Body* rest, int l) {
 		m = smult(n,&u);
 		ds = vplus(&ds,&m);
 	}
-	return vplus(&(thing->position),&ds);
+	return ds;
 }
 
 int main(int argc, char **argv) {
-	int i;
+	int i,j;
+	Vector ds[3] = {
+		{0,0},
+		{0,0},
+		{0,0}
+	}
 	Body b[3] = {
 		{{0,0},{0,0},1},
 		{{1,1},{0,0},2},
 		{{-1,0},{0,0},3}
 	};
 	for(i = 0; i<1000; ++i) {
-		move(&a,other,2);
+		for(j = 0; j<3; ++j) {
+			ds[j] = move(&(b[j]),b,3);
+		}
+		for(j = 0; j<3; ++j) {
+			b[j].position = vplus(&(b.position),&ds[j]));
+		}
 		print(&(a.position),"");
 	}
 }
