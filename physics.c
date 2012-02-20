@@ -12,7 +12,7 @@
 #define PATHLEN 10000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
-double steps = 2.0;
+double timeStep = 60.0;
 
 typedef struct {
 	double r;
@@ -86,7 +86,7 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 		diff = vminus(&(b.position),&(thing->position));
 
 		u = unit(&diff);
-		m = smult(n,&u);
+		m = smult(4*n,&u);
 		ds = vplus(&ds,&m);
 	}
 	return ds;
@@ -117,19 +117,18 @@ void circle(Vector *pos, double r, Colour *c) {
 }
 
 void keyPressed (unsigned char key, int x, int y) {
-	printf("%c\n",key);
+	//printf("%c\n",key);
 	if(key == 'f') {
 		glutFullScreenToggle();
 	}
 	if(key == 'q') {
 		glutLeaveMainLoop();
 	}
-	if(key == '+') {
-		steps *= STEP;
-	}
 	if(key == '-') {
-		steps /= STEP;
-		if(steps <= 1) steps = 1;
+		timeStep *= STEP;
+	}
+	if(key == '+') {
+		timeStep /= STEP;
 	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
@@ -217,31 +216,44 @@ Body b[4] = {};
 
 static const int bodies = 4;
 
-void step() {
-	int j,k;
-	glutTimerFunc(TIMERMSECS, step, 0);
+int startTime;
+int prevTime;
 
+void display() {
+	int j,k;
 	glClear (GL_COLOR_BUFFER_BIT);
 	glClearColor(0,0,0,1);
 	glLoadIdentity();
-
-	for(k = 0; k<(int)steps; k++) {
-		for(j = 0; j<bodies; ++j) {
-			b[j].acceleration = move(&(b[j]),b,bodies,j);
-		}
-		for(j = 0; j<bodies; ++j) {
-			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
-			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-			b[j].path.pos++;
-			PATH_MOD(b[j].path.pos);
-			b[j].path.point[b[j].path.pos] = b[j].position;
-		}
+	for(j = 0; j<bodies; ++j) {
+		b[j].acceleration = move(&(b[j]),b,bodies,j);
+	}
+	for(j = 0; j<bodies; ++j) {
+		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
+		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
+		b[j].path.pos++;
+		PATH_MOD(b[j].path.pos);
+		b[j].path.point[b[j].path.pos] = b[j].position;
 	}
 	for(j = 0; j<bodies; ++j) {
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
 	glutSwapBuffers();
+}
+
+void step() {
+
+	glutTimerFunc(timeStep,step,0);
+	int currTime = glutGet(GLUT_ELAPSED_TIME);
+	int timeSincePrevFrame = currTime - prevTime;
+	int elapsedTime = currTime - startTime;
+
+	if(elapsedTime < timeStep) {
+		sleep(elapsedTime-timeStep);
+	}
+
+	display();
+	prevTime = currTime;
 }
 
 int main(int argc, char **argv) {
@@ -251,19 +263,17 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
 
-	GLboolean out;
-	glGetBooleanv(GL_RGBA_MODE,&out);
-	printf("%d\n",out);
-
 	srand(time(NULL));
 
-	b[0] = newBody(newVector(0,.5),newVector(0.0002,0),200);
-	b[1] = newBody(newVector(.5,0),newVector(0,-0.0004),10);
-	b[2] = newBody(newVector(-.5,0),newVector(0,0.0004),10);
-	b[3] = newBody(newVector(0,-.5),newVector(-0.0002,0),200);
+	b[0] = newBody(newVector(0,.5),newVector(0.0003,0),200);
+	b[1] = newBody(newVector(.5,0),newVector(-0.0001,-0.0004),20);
+	b[2] = newBody(newVector(-.5,0),newVector(0.0001,0.0004),20);
+	b[3] = newBody(newVector(0,-.5),newVector(-0.0003,0),200);
 
-	//glutDisplayFunc(display);
-	glutTimerFunc(TIMERMSECS, step, 0);
+	startTime = glutGet(GLUT_ELAPSED_TIME);
+	prevTime = startTime;
+
+	glutTimerFunc(timeStep,step,0);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
