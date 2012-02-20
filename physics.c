@@ -270,11 +270,6 @@ int main(int argc, char **argv) {
 		),10*(float)rand()/(float)RAND_MAX);
 	}
 
-	b[0] = newBody(newVector(0,.5),newVector(0.0002,0),200);
-	b[1] = newBody(newVector(.5,0),newVector(0,-0.0004),10);
-	b[2] = newBody(newVector(-.5,0),newVector(0,0.0004),10);
-	b[3] = newBody(newVector(0,-.5),newVector(-0.0002,0),200);
-
 	//glutDisplayFunc(display);
 	glutTimerFunc(TIMERMSECS, step, 0);
 	glutKeyboardFunc(keyPressed);
