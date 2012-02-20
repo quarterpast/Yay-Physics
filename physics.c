@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <GL/glut.h>
 #define G 1e-4
 
 typedef struct {
@@ -9,7 +10,8 @@ typedef struct {
 
 typedef struct {
 	Vector position;
-	Vector initial;
+	Vector velocity;
+	Vector acceleration;
 	double mass;
 } Body;
 
@@ -67,16 +69,13 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 
 int main(int argc, char **argv) {
 	int i,j;
-	Vector ds[3] = {
-		{0,0},
-		{0,0},
-		{0,0}
-	};
+
 	Body b[3] = {
-		{{0,0},{0,0},1},
-		{{1,1},{0,0},2},
-		{{-1,0},{0,0},3}
+		{{0,0},{0,0},{0,0},1},
+		{{1,1},{0,0},{0,0},2},
+		{{-1,0},{0,0},{0,0},3}
 	};
+
 	for(i = 0; i<1000; ++i) {
 		for(j = 0; j<3; ++j) {
 			ds[j] = move(&(b[j]),b,3,j);
@@ -84,6 +83,6 @@ int main(int argc, char **argv) {
 		for(j = 0; j<3; ++j) {
 			b[j].position = vplus(&(b[j].position),&ds[j]);
 		}
-		//vprint(&(b[0].position),"");
+		vprint(&(b[0].position),"");
 	}
 }
