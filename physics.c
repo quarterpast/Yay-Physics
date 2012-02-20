@@ -5,16 +5,16 @@
 #define WIDTH 750
 #define HEIGHT 750
 #define TIMERMSECS 1000/60
+#define PATHLEN 500
 
 typedef struct {
 	double x;
 	double y;
 } Vector;
 
-typedef struct node {
-	Vector *pos;
-	struct node *next;
-	struct node *prev;
+typedef struct {
+	Vector *point;
+	size_t pos;
 } Path;
 
 typedef struct {
@@ -23,7 +23,6 @@ typedef struct {
 	Vector acceleration;
 	double mass;
 	Path path;
-	Path first;
 } Body;
 
 double newt(double m, double r) {
@@ -112,30 +111,48 @@ void reshape (int w, int h) {
 	height = h;
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
+void startPath(Body *b) {
+	glBegin(GL_LINE_STRIP);
+}
+void drawPath(Body *b,Vector *pos) {
+	Vector px = coordToScreen(pos);
+	glVertex2f(px.x,px.y);
+}
+void endPath(Body *b) {
+	glEnd();
+}
 
-void traverse(Body *b, void (*cb)(Vector*)) {
-	Path *node;
-	for(node = &(b->first); node->next != NULL; node = node->next) {
-		cb(node->pos);
+void traverse(
+	Body *b,
+	void (*start)(Body*),
+	void (*cb)(Body*,Vector*),
+	void (*end)(Body*)
+) {
+	int i,j;
+	start(b);
+	for(i = 0; i<PATHLEN; ++i) {
+		j = i+b->path.pos;
+		if(j > PATHLEN) {
+			j -= PATHLEN;
+		}
+		cb(b,&(b->path.point[j]));
 	}
+	end(b);
 }
 
 Body newBody(Vector pos, Vector vel, double mass) {
+	Vector *arr = malloc(PATHLEN*sizeof(Vector));
+	int i;
+	Path path = {
+		arr,
+		0
+	};
 	Body out = {
 		pos,
 		vel,
 		{0,0},
 		mass,
-		{
-			&pos,
-			NULL,
-			NULL
-		},
-		{
-			&pos,
-			NULL,
-			NULL
-		}
+		path
 	};
 
 	return out;
@@ -146,7 +163,7 @@ Vector newVector(double x, double y) {
 }
 
 
-Body b[2] = {};
+Body b[4] = {};
 
 static const int bodies = 4;
 
@@ -164,10 +181,9 @@ void step() {
 	for(j = 0; j<bodies; ++j) {
 		b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 		b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-		Path node = {&(b[j].position),NULL,&(b[j].path)};
-		b[j].path.next = &node;
-		b[j].path = node;
+		b[j].path.point[b[j].path.pos++] = b[j].position;
 		circle(&(b[j].position),sqrt(b[j].mass));
+		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
 	glutSwapBuffers();
 }
