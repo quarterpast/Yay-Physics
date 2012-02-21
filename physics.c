@@ -12,7 +12,6 @@
 #define PATHLEN 10000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
-
 double steps = 2.0;
 
 typedef struct {
@@ -60,6 +59,7 @@ void vprint(Vector *a,char *str) {
 	printf("%s(%f,%f)\n",str,a->x,a->y);
 }
 double norm(Vector *a) {
+	//return fabs(a->x)+fabs(a->y); TAXICAB
 	return sqrt(a->x * a->x + a->y * a->y);
 }
 double distance(Vector *a, Vector *b) {
@@ -130,7 +130,7 @@ void keyPressed (unsigned char key, int x, int y) {
 	}
 	if(key == '-') {
 		steps /= STEP;
-		if(steps <= 1) steps = 1;
+		if(steps < 1) steps = 1;
 	}
 	if(key == '\x1e') {
 		// glutLeaveFullScreen();
