@@ -10,6 +10,16 @@ typedef struct {
 	Colour colour;
 } Body;
 
+typedef struct {
+	Vector *point;
+	size_t pos;
+} Path;
+
+void startPath(Body*);
+void drawPath(Body*,Vector*,int);
+void endPath(Body*);
+void traverse(Body*,void (*start)(Body*),void (*cb)(Body*,Vector*,int),void (*end)(Body*));
+
 Body newBody(Vector, Vector, double);
 double newt(double, double);
 bool collide(Body*, Body*, int, int);

@@ -11,7 +11,7 @@ OBJS := $(patsubst %.c, %.o, $(C_FILES))
 
 .SUFFIXES: .c .o
 
-all: clean $(PROGRAM)
+all: $(PROGRAM)
 
 $(PROGRAM): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $(PROGRAM)
