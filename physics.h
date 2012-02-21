@@ -10,7 +10,7 @@
 #define G 1e-8
 #define WIDTH 750
 #define HEIGHT 750
-#define TIMERMSECS 1000/60
+#define TIMERMSECS 10
 #define STEP 1.2
 #define PATHLEN 1000
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}

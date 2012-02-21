@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 	}
 
 	glutDisplayFunc(step);
-	glutTimerFunc(TIMERMSECS, step, 0);
+	glutIdleFunc(step);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
@@ -68,6 +68,7 @@ void keyPressed (unsigned char key, int x, int y) {
 		#ifdef __FREEGLUT_STD_H__
 		glutLeaveMainLoop();
 		#else
+		exit(0);// lol
 		#endif
 	}
 	if(key == '+') {
@@ -90,8 +91,8 @@ void reshape (int w, int h) {
 }
 void step() {
 	int j,k;
-	Colour red = {1.0,0.0,0.0,1.0};
-	glutTimerFunc(TIMERMSECS, step, 0);
+	Colour red = {1.0,0.0,0.0,0.5};
+	//glutTimerFunc(TIMERMSECS, step, 0);
 
 	glClear (GL_COLOR_BUFFER_BIT);
 	glClearColor(0,0,0,1);
