@@ -5,6 +5,8 @@ int bodies;
 double steps = 2.0;
 int width = WIDTH;
 int height = HEIGHT;
+int oldwidth = WIDTH;
+int oldheight = HEIGHT;
 
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
@@ -47,6 +49,16 @@ void keyPressed (unsigned char key, int x, int y) {
 		#ifdef __FREEGLUT_STD_H__
 		glutFullScreenToggle();
 		#else
+		if(
+			glutGet(GLUT_WINDOW_WIDTH) == glutGet(GLUT_SCREEN_WIDTH) &&
+			glutGet(GLUT_WINDOW_HEIGHT) == glutGet(GLUT_SCREEN_HEIGHT) &&
+			glutGet(GLUT_WINDOW_X) == 0 &&
+			glutGet(GLUT_WINDOW_Y) == 0
+		) {
+			glutReshapeWindow(oldwidth,oldheight);
+		} else {
+			glutFullScreen();
+		}
 		#endif
 	}
 	if(key == 'q') {
@@ -67,6 +79,8 @@ void keyPressed (unsigned char key, int x, int y) {
 	}
 }
 void reshape (int w, int h) {
+	oldwidth = width;
+	oldheight = height;
 	width = w;
 	height = h;
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);

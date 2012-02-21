@@ -34,8 +34,8 @@ Vector unit(Vector *a) {
 	return out;
 }
 Vector coordToScreen(Vector *pos) {
-	int width = glutGet(GLUT_SCREEN_WIDTH);
-	int height = glutGet(GLUT_SCREEN_HEIGHT);
+	int width = glutGet(GLUT_WINDOW_WIDTH);
+	int height = glutGet(GLUT_WINDOW_HEIGHT);
 	Vector out = {pos->x*WIDTH/width,pos->y*HEIGHT/height};
 	return out;
 }
