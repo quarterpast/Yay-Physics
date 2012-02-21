@@ -1,7 +1,30 @@
+ifneq (,)
+This makefile requires GNU Make.
+endif
+
+PROGRAM=physics
+
+CC=gcc
+CFLAGS=-g -lm `pkg-config --cflags --libs glut`
+C_FILES := $(wildcard *.c)
+OBJS := $(patsubst %.c, %.o, $(C_FILES))
+
+.SUFFIXES: .c .o
+
 all: clean physics
 
-physics: physics.c
-	gcc -o physics physics.c -g -lm `pkg-config --cflags --libs glut`
+all: clean $(PROGRAM)
+
+$(PROGRAM): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $(PROGRAM)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%: %.c
+	$(CC) $(CFLAGS) -o $@ $< 
 
 clean:
-	rm -f physics
+	rm -f $(PROGRAM) *.o
+
+.PHONY: clean
