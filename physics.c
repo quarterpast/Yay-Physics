@@ -9,6 +9,10 @@ int oldwidth = WIDTH;
 int oldheight = HEIGHT;
 
 int main(int argc, char **argv) {
+	if(argc < 2) {
+		printf("Usage: %s numbodies\n",argv[0]);
+		return 1;
+	}
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
 	glutInitWindowSize (WIDTH, HEIGHT);
@@ -16,7 +20,6 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Yay physics");
 
 	srand(time(NULL));
-	if(argc < 2) return 1;
 
 	bodies = atoi(argv[1]);
 	b = malloc(bodies*sizeof(Body));
