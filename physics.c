@@ -44,10 +44,16 @@ int main(int argc, char **argv) {
 void keyPressed (unsigned char key, int x, int y) {
 	printf("%c\n",key);
 	if(key == 'f') {
-		//glutFullScreenToggle();
+		#ifdef __FREEGLUT_STD_H__
+		glutFullScreenToggle();
+		#else
+		#endif
 	}
 	if(key == 'q') {
-		//glutLeaveMainLoop();
+		#ifdef __FREEGLUT_STD_H__
+		glutLeaveMainLoop();
+		#else
+		#endif
 	}
 	if(key == '+') {
 		steps *= STEP;

@@ -6,7 +6,6 @@
 #include <GL/glut.h>
 #include "colour.h"
 #include "vector.h"
-#include "path.h"
 #include "body.h"
 #define G 1e-8
 #define WIDTH 750

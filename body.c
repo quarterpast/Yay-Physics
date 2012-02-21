@@ -58,6 +58,8 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 }
 void circle(Vector *pos, double r, Colour *c) {
 	double t;
+	int width = glutGet(GLUT_WINDOW_WIDTH);
+	int height = glutGet(GLUT_WINDOW_HEIGHT);
 	Vector sc = coordToScreen(pos);
 	glBegin(GL_TRIANGLE_FAN);
 	glColour(c);

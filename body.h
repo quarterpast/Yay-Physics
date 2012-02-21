@@ -2,6 +2,11 @@
 #define BODY_H 1
 
 typedef struct {
+	Vector *point;
+	size_t pos;
+} Path;
+
+typedef struct {
 	Vector position;
 	Vector velocity;
 	Vector acceleration;
@@ -9,11 +14,6 @@ typedef struct {
 	Path path;
 	Colour colour;
 } Body;
-
-typedef struct {
-	Vector *point;
-	size_t pos;
-} Path;
 
 void startPath(Body*);
 void drawPath(Body*,Vector*,int);
