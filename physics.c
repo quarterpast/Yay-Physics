@@ -9,11 +9,9 @@
 #define HEIGHT 750
 #define TIMERMSECS 1000/60
 #define STEP 1.2
-#define PATHLEN 10000
+#define PATHLEN 1
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
-
-double steps = 2.0;
 
 typedef struct {
 	double r;
@@ -40,6 +38,10 @@ typedef struct {
 	Path path;
 	Colour colour;
 } Body;
+
+Body *b;
+int bodies;
+double steps = 2.0;
 
 double newt(double m, double r) {
 	return G*m/(r*r);
@@ -120,10 +122,10 @@ void circle(Vector *pos, double r, Colour *c) {
 void keyPressed (unsigned char key, int x, int y) {
 	printf("%c\n",key);
 	if(key == 'f') {
-		glutFullScreenToggle();
+		//glutFullScreenToggle();
 	}
 	if(key == 'q') {
-		glutLeaveMainLoop();
+		//glutLeaveMainLoop();
 	}
 	if(key == '+') {
 		steps *= STEP;
@@ -213,13 +215,24 @@ Vector newVector(double x, double y) {
 	return out;
 }
 
-
-Body *b;
-
-int bodies;
+bool collide(Body *thing, Body *rest, int l, int skip) {
+	int i;
+	double n, r;
+	Vector ds = {0,0}, diff, u ,m;
+	Body b;
+	for(i=0; i<l; ++i) {
+		if(i == skip) continue;
+		b = rest[i];
+		r = distance(&(thing->position),&(b.position));
+		printf("%f %f\n",r, sqrt(thing->mass)+sqrt(b.mass));
+		if(r < sqrt(thing->mass)+sqrt(b.mass)) return true;
+	}
+	return false;
+}
 
 void step() {
 	int j,k;
+	Colour red = {1.0,0.0,0.0,1.0};
 	glutTimerFunc(TIMERMSECS, step, 0);
 
 	glClear (GL_COLOR_BUFFER_BIT);
@@ -239,6 +252,7 @@ void step() {
 		}
 	}
 	for(j = 0; j<bodies; ++j) {
+		if(collide(&(b[j]),b,bodies,j)) b[j].colour = red;
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
 		traverse(&(b[j]),startPath,drawPath,endPath);
 	}
@@ -258,8 +272,8 @@ int main(int argc, char **argv) {
 	bodies = atoi(argv[1]);
 	b = malloc(bodies*sizeof(Body));
 	int i;
-	b[0] = newBody(newVector(0,0.0001),newVector(0,0),1000);
-	for(i=1;i<bodies;++i) {
+	//b[0] = newBody(newVector(0,0.0001),newVector(0,0),1000);
+	for(i=0;i<bodies;++i) {
 		b[i] = newBody(newVector(
 			1-2*(float)rand()/(float)RAND_MAX,
 			1-2*(float)rand()/(float)RAND_MAX
@@ -267,10 +281,10 @@ int main(int argc, char **argv) {
 		newVector(
 			0.002-0.004*(float)rand()/(float)RAND_MAX,
 			0.002-0.004*(float)rand()/(float)RAND_MAX
-		),10*(float)rand()/(float)RAND_MAX);
+		),100*(float)rand()/(float)RAND_MAX);
 	}
 
-	//glutDisplayFunc(display);
+	glutDisplayFunc(step);
 	glutTimerFunc(TIMERMSECS, step, 0);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);

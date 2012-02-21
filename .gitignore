@@ -1,2 +1,4 @@
 physics
 *.o
+*.DS_Store
+*.dSYM
