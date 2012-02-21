@@ -11,8 +11,6 @@ OBJS := $(patsubst %.c, %.o, $(C_FILES))
 
 .SUFFIXES: .c .o
 
-all: clean physics
-
 all: clean $(PROGRAM)
 
 $(PROGRAM): $(OBJS)
