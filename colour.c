@@ -4,7 +4,7 @@
 
 /* Colour fadey functions */
 void glColour(Colour *c) {
-	glColor4f(c->r,c->g,c->b,c->a);
+	glColor4dv(c);
 }
 Colour fade(Colour *c,int i) {
 	Colour out = {
@@ -22,4 +22,12 @@ Colour randColour() {
 	a = 1.0;
 	Colour out = {r,g,b,a};
 	return out;
+	/*
+	Colour c;
+	c.r = 1.0;
+	c.g = 0.0;
+	c.b = 0.0;
+	c.a = 1.0;
+	return c;
+	*/
 }

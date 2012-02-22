@@ -132,7 +132,7 @@ void traverse(Body *b) {
 		PATH_MOD(j);
 		Vector px = coordToScreen(&(b->path.point[j]));
 		Colour faded = fade(&(b->colour),i);
-		glColour(&faded);
+		//glColour(&faded);
 		glVertex2f(px.x,px.y);
 	}
 	glEnd(); // GL_LINE_STRIP
