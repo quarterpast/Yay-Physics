@@ -71,30 +71,16 @@ void circle(Vector *pos, double r, Colour *c) {
 	glEnd();
 }
 
-void startPath(Body *b) {
-	glBegin(GL_LINE_STRIP);
-}
-void drawPath(Body *b,Vector *pos,int i) {
-	Vector px = coordToScreen(pos);
-	Colour faded = fade(&(b->colour),i);
-	glColour(&faded);
-	glVertex2f(px.x,px.y);
-}
-void endPath(Body *b) {
-	glEnd();
-}
-void traverse(
-	Body *b,
-	void (*start)(Body*),
-	void (*cb)(Body*,Vector*,int),
-	void (*end)(Body*)
-) {
+void traverse(Body *b) {
 	int i,j;
-	start(b);
-	for(i = 1; i<PATHLEN; i++) {
+	glBegin(GL_LINE_STRIP);
+	for(i = 1; i<1000; i++) {
 		j = i+b->path.pos;
 		PATH_MOD(j);
-		cb(b,&(b->path.point[j]),i);
+		Vector px = coordToScreen(&(b->path.point[j]));
+		Colour faded = fade(&(b->colour),i);
+		glColour(&faded);
+		glVertex2f(px.x,px.y);
 	}
-	end(b);
+	glEnd(); // GL_LINE_STRIP
 }

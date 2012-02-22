@@ -25,10 +25,7 @@ typedef struct {
 	Colour colour;
 } Body;
 
-void startPath(Body*);
-void drawPath(Body*,Vector*,int);
-void endPath(Body*);
-void traverse(Body*,void (*start)(Body*),void (*cb)(Body*,Vector*,int),void (*end)(Body*));
+void traverse(Body*);
 
 Body newBody(Vector, Vector, double);
 double newt(double, double);

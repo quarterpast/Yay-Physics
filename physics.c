@@ -113,7 +113,7 @@ void step() {
 	for(j = 0; j<bodies; ++j) {
 		//if(collide(&(b[j]),b,bodies,j)) b[j].colour = red;
 		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
-		traverse(&(b[j]),startPath,drawPath,endPath);
+		traverse(&(b[j]));
 	}
 	glutSwapBuffers();
 }
