@@ -1,9 +1,21 @@
+#ifndef PHYSICS_H
+#define PHYSICS_H
+
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
+
+#ifdef __LINUX__ // OS
 #include <GL/glut.h>
+#elif defined __APPLE__
+#include <OpenGL/gl.h>
+#include <GLUT/glut.h>
+#else // WINDOWS
+#error Not supported 
+#endif // OS
+
 #include "colour.h"
 #include "vector.h"
 #include "body.h"
@@ -18,3 +30,6 @@
 void keyPressed(unsigned char, int, int);
 void reshape(int, int);
 void step();
+
+#endif // PHYSICS_H
+
