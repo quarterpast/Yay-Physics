@@ -37,13 +37,16 @@ int main(int argc, char **argv) {
 	}
 
 	glutDisplayFunc(step);
-	glutTimerFunc(TIMERMSECS, glutPostRedisplay, 0);
+	glutTimerFunc(TIMERMSECS, timerFunc, 0);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
 	glutMainLoop();
 }
 
+void timerFunc(int notUsed) {
+	glutPostRedisplay();
+}
 
 /* GL/GLUT stuff */
 void keyPressed (unsigned char key, int x, int y) {

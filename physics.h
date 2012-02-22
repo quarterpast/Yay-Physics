@@ -6,6 +6,7 @@
 #define TIMERMSECS 10
 #define STEP 1.2
 
+void timerFunc(int);
 void keyPressed(unsigned char, int, int);
 void reshape(int, int);
 void step();
