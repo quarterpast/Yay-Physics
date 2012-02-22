@@ -16,10 +16,14 @@ Colour fade(Colour *c,int i) {
 	return out;
 }
 Colour randColour() {
-	double r = 1.0-0.5*(((double)rand())/((double)RAND_MAX)),
-	g = 1.0-0.5*(((double)rand())/((double)RAND_MAX)),
-	b = 1.0-0.5*(((double)rand())/((double)RAND_MAX)),
-	a = 1.0;
+	double r = 1.0-0.5*(((double)rand())/((double)RAND_MAX));
+	double g = 1.0-0.5*(((double)rand())/((double)RAND_MAX));
+	double b = 1.0-0.5*(((double)rand())/((double)RAND_MAX));
+	double a = 1.0;
 	Colour out = {r,g,b,a};
+	//printColour(&out);
 	return out;
+}
+void printColour(Colour *c) {
+	printf("{%lf,%lf,%lf,%lf}\n",c->r,c->g,c->b,c->a);
 }

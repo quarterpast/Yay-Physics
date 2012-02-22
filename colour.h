@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifndef COLOUR_H
 #define COLOUR_H
@@ -15,5 +16,6 @@ typedef struct {
 void glColour(Colour*);
 Colour fade(Colour*,int);
 Colour randColour();
+void printColour(Colour*);
 
 #endif
