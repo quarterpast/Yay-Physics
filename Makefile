@@ -19,7 +19,7 @@ OBJS := $(patsubst %.c, %.o, $(C_FILES))
 all: $(PROGRAM)
 
 $(PROGRAM): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $(PROGRAM)
+	$(CC) $(OBJS) -o $(PROGRAM) $(LDFLAGS) $(CFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
