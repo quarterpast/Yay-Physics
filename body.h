@@ -29,6 +29,5 @@ Body newBody(Vector, Vector, double);
 double newt(double, double);
 bool collide(Body*, Body*, int, int);
 Vector move(Body*, Body*, int, int);
-void circle(Vector*, double, Colour*);
 
 #endif
