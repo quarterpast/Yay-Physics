@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 	}
 
 	glutDisplayFunc(step);
-	glutTimerFunc(TIMERMSECS, step, 0);
+	glutTimerFunc(TIMERMSECS, glutPostRedisplay, 0);
 	glutKeyboardFunc(keyPressed);
 	glutReshapeFunc(reshape);
 
