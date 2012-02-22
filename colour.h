@@ -1,5 +1,9 @@
+#include <stdlib.h>
+
 #ifndef COLOUR_H
 #define COLOUR_H 1
+
+#define PATHLEN 1000
 
 typedef struct {
 	double r;

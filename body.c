@@ -1,4 +1,4 @@
-#include "physics.h"
+#include "body.h"
 /* Body */
 Body newBody(Vector pos, Vector vel, double mass) {
 	Vector *arr = malloc(PATHLEN*sizeof(Vector));

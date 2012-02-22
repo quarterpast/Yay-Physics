@@ -1,4 +1,8 @@
-#include "physics.h"
+#include "colour.h"
+
+#define PATHLEN 1000
+#define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
+
 /* Colour fadey functions */
 void glColour(Colour *c) {
 	glColor4f(c->r,c->g,c->b,c->a);

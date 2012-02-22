@@ -1,4 +1,4 @@
-#include "physics.h"
+#include "vector.h"
 /* Vectors! */
 
 Vector newVector(double x, double y) {
