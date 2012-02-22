@@ -9,8 +9,8 @@
 #error Not supported 
 #endif // OS
 
-// #ifndef VECTOR_H
-// #define VECTOR_H 1
+#ifndef VECTOR_H
+#define VECTOR_H
 
 #define WIDTH 750
 #define HEIGHT 750
@@ -27,6 +27,5 @@ Vector smult(double, Vector*);
 double norm(Vector *);
 double distance(Vector*, Vector*);
 Vector unit(Vector*);
-Vector coordToScreen(Vector*);
 
-// #endif
+#endif

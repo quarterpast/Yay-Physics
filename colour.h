@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #ifndef COLOUR_H
-#define COLOUR_H 1
+#define COLOUR_H
 
 #define PATHLEN 1000
 

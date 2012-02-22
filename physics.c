@@ -117,3 +117,32 @@ void step() {
 	}
 	glutSwapBuffers();
 }
+Vector coordToScreen(Vector *pos) {
+	Vector out = {pos->x*WIDTH/width,pos->y*HEIGHT/height};
+	return out;
+}
+void traverse(Body *b) {
+	int i,j;
+	glBegin(GL_LINE_STRIP);
+	for(i = 1; i<1000; i++) {
+		j = i+b->path.pos;
+		PATH_MOD(j);
+		Vector px = coordToScreen(&(b->path.point[j]));
+		Colour faded = fade(&(b->colour),i);
+		glColour(&faded);
+		glVertex2f(px.x,px.y);
+	}
+	glEnd(); // GL_LINE_STRIP
+}
+void circle(Vector *pos, double r, Colour *c) {
+	double t;
+	Vector sc = coordToScreen(pos);
+	glBegin(GL_TRIANGLE_FAN);
+	glColour(c);
+	glVertex2f(sc.x,sc.y);
+	r = fmax(r,2);
+	for(t = 0; t < M_PI*2; t += M_PI/72) {
+		glVertex2f(sc.x+sin(t)*r/width, sc.y+cos(t)*r/height);
+	}
+	glEnd();
+}

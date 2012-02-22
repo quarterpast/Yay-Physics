@@ -56,31 +56,3 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 	}
 	return ds;
 }
-void circle(Vector *pos, double r, Colour *c) {
-	double t;
-	int width = glutGet(GLUT_WINDOW_WIDTH);
-	int height = glutGet(GLUT_WINDOW_HEIGHT);
-	Vector sc = coordToScreen(pos);
-	glBegin(GL_TRIANGLE_FAN);
-	glColour(c);
-	glVertex2f(sc.x,sc.y);
-	r = fmax(r,2);
-	for(t = 0; t < M_PI*2; t += M_PI/72) {
-		glVertex2f(sc.x+sin(t)*r/width, sc.y+cos(t)*r/height);
-	}
-	glEnd();
-}
-
-void traverse(Body *b) {
-	int i,j;
-	glBegin(GL_LINE_STRIP);
-	for(i = 1; i<1000; i++) {
-		j = i+b->path.pos;
-		PATH_MOD(j);
-		Vector px = coordToScreen(&(b->path.point[j]));
-		Colour faded = fade(&(b->colour),i);
-		glColour(&faded);
-		glVertex2f(px.x,px.y);
-	}
-	glEnd(); // GL_LINE_STRIP
-}

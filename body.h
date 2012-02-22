@@ -6,7 +6,7 @@
 #include "colour.h"
 
 #ifndef BODY_H
-#define BODY_H 1
+#define BODY_H
 
 #define G 1e-8
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
@@ -24,8 +24,6 @@ typedef struct {
 	Path path;
 	Colour colour;
 } Body;
-
-void traverse(Body*);
 
 Body newBody(Vector, Vector, double);
 double newt(double, double);
