@@ -1,15 +1,11 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <time.h>
-
-#include "vector.h"
-#include "colour.h"
-
 #ifndef BODY_H
 #define BODY_H
 
-#define G 1e-8
-#define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
+#include <sys/types.h>
+#include <stdbool.h>
+
+#include "vector.h"
+#include "colour.h"
 
 typedef struct {
 	Vector *point;

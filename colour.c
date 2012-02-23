@@ -1,6 +1,7 @@
 #include "colour.h"
 
-#define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
+#include <stdlib.h>
+#include <stdio.h>
 
 /* Colour fadey functions */
 void glColour(Colour *c) {

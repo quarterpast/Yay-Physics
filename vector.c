@@ -1,4 +1,7 @@
 #include "vector.h"
+
+#include <math.h>
+
 /* Vectors! */
 
 Vector newVector(double x, double y) {

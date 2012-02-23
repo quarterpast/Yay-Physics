@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #ifndef COLOUR_H
 #define COLOUR_H
 

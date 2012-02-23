@@ -1,10 +1,7 @@
-#include "body.h"
-
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#define TIMERMSECS 10
-#define STEP 1.2
+#include "body.h"
 
 void timerFunc(int);
 void keyPressed(unsigned char, int, int);
@@ -15,4 +12,3 @@ void traverse(Body*);
 void circle(Vector*, double, Colour*);
 
 #endif // PHYSICS_H
-

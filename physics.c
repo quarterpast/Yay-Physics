@@ -1,5 +1,26 @@
 #include "physics.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+#ifdef __linux__ // OS
+#include <GL/glut.h>
+#elif defined __APPLE__
+#include <OpenGL/gl.h>
+#include <GLUT/glut.h>
+#else // WINDOWS
+#error Not supported 
+#endif // OS
+
+#define WIDTH 750
+#define HEIGHT 750
+
+#define TIMERMSECS 10
+#define STEP 1.2
+
+#define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
+
 Body *b;
 int bodies;
 double steps = 2.0;
