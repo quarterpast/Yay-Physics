@@ -23,6 +23,7 @@ typedef struct {
 
 Body newBody(Vector, Vector, double);
 double newt(double, double);
+double mass(Body*);
 bool collide(Body*, Body*, int, int);
 Vector move(Body*, Body*, int, int);
 
