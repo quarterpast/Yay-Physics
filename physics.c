@@ -47,14 +47,17 @@ int main(int argc, char **argv) {
 	int i;
 	//b[0] = newBody(newVector(0,0.0001),newVector(0,0),1000);
 	for(i=0;i<bodies;++i) {
-		b[i] = newBody(newVector(
-			1-2*(float)rand()/(float)RAND_MAX,
-			1-2*(float)rand()/(float)RAND_MAX
-		),
-		newVector(
-			0.002-0.004*(float)rand()/(float)RAND_MAX,
-			0.002-0.004*(float)rand()/(float)RAND_MAX
-		),100*(float)rand()/(float)RAND_MAX);
+		b[i] = newBody(
+			newVector(
+				1-2*(float)rand()/(float)RAND_MAX,
+				1-2*(float)rand()/(float)RAND_MAX
+			),
+			newVector(
+				0.002-0.004*(float)rand()/(float)RAND_MAX,
+				0.002-0.004*(float)rand()/(float)RAND_MAX
+			),
+			100*(float)rand()/(float)RAND_MAX
+		);
 	}
 
 	glutDisplayFunc(step);
@@ -142,7 +145,7 @@ void step() {
 	glutSwapBuffers();
 }
 Vector coordToScreen(Vector *pos) {
-	Vector out = {pos->x*WIDTH/width,pos->y*HEIGHT/height};
+	Vector out = { pos->x*WIDTH/width, pos->y*HEIGHT/height };
 	return out;
 }
 void traverse(Body *b) {
