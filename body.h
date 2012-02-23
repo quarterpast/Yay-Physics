@@ -16,7 +16,7 @@ typedef struct {
 	Vector position;
 	Vector velocity;
 	Vector acceleration;
-	double mass;
+	double radius;
 	Path path;
 	Colour colour;
 } Body;

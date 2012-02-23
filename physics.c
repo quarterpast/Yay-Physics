@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 		newVector(
 			0.002-0.004*(float)rand()/(float)RAND_MAX,
 			0.002-0.004*(float)rand()/(float)RAND_MAX
-		),100*(float)rand()/(float)RAND_MAX);
+		),5*(float)rand()/(float)RAND_MAX);
 	}
 
 	glutDisplayFunc(step);
@@ -136,7 +136,7 @@ void step() {
 	}
 	for(j = 0; j<bodies; ++j) {
 		if(collide(&(b[j]),b,bodies,j)) b[j].colour = red;
-		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
+		circle(&(b[j].position),b[j].radius,&(b[j].colour));
 		traverse(&(b[j]));
 	}
 	glutSwapBuffers();

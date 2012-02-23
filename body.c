@@ -8,7 +8,7 @@
 #define G 1e-8
 
 /* Body */
-Body newBody(Vector pos, Vector vel, double mass) {
+Body newBody(Vector pos, Vector vel, double radius) {
 	Vector *arr = malloc(PATHLEN*sizeof(Vector));
 	int i;
 	for(i = 0; i<PATHLEN; i++) {
@@ -22,7 +22,7 @@ Body newBody(Vector pos, Vector vel, double mass) {
 		pos,
 		vel,
 		{0,0},
-		mass,
+		radius,
 		path,
 		randColour()
 	};
@@ -31,6 +31,9 @@ Body newBody(Vector pos, Vector vel, double mass) {
 }
 double newt(double m, double r) {
 	return G*m/(r*r);
+}
+double mass(Body *b) {
+	return b->radius*b->radius*b->radius;
 }
 bool collide(Body *thing, Body *rest, int l, int skip) {
 	int i;
@@ -41,8 +44,8 @@ bool collide(Body *thing, Body *rest, int l, int skip) {
 		if(i == skip) continue;
 		b = rest[i];
 		r = distance(&(thing->position),&(b.position));
-		printf("%f %f\n",r, sqrt(thing->mass)+sqrt(b.mass));
-		if(r < sqrt(thing->mass)+sqrt(b.mass)) return true;
+		printf("%f %f\n",r, thing->radius+b.radius);
+		if(r < thing->radius+b.radius) return true;
 	}
 	return false;
 }
@@ -55,7 +58,7 @@ Vector move(Body* thing, Body* rest, int l, int skip) {
 		if(i == skip) continue;
 		b = rest[i];
 		r = distance(&(thing->position),&(b.position));
-		n = newt(rest[i].mass,r);
+		n = newt(mass(&b),r);
 		diff = vminus(&(b.position),&(thing->position));
 
 		u = unit(&diff);
