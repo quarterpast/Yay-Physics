@@ -29,45 +29,6 @@ int height = HEIGHT;
 int oldwidth = WIDTH;
 int oldheight = HEIGHT;
 
-int main(int argc, char **argv) {
-	if(argc < 2) {
-		printf("Usage: %s numbodies\n",argv[0]);
-		return 1;
-	}
-	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
-	glutInitWindowSize (WIDTH, HEIGHT);
-	glutInitWindowPosition (0, 0);
-	glutCreateWindow("Yay physics");
-
-	srand(time(NULL));
-
-	bodies = atoi(argv[1]);
-	b = malloc(bodies*sizeof(Body));
-	int i;
-	//b[0] = newBody(newVector(0,0.0001),newVector(0,0),1000);
-	for(i=0;i<bodies;++i) {
-		b[i] = newBody(
-			newVector(
-				1-2*(float)rand()/(float)RAND_MAX,
-				1-2*(float)rand()/(float)RAND_MAX
-			),
-			newVector(
-				0.002-0.004*(float)rand()/(float)RAND_MAX,
-				0.002-0.004*(float)rand()/(float)RAND_MAX
-			),
-			100*(float)rand()/(float)RAND_MAX
-		);
-	}
-
-	glutDisplayFunc(step);
-	glutTimerFunc(TIMERMSECS, timerFunc, 0);
-	glutKeyboardFunc(keyPressed);
-	glutReshapeFunc(reshape);
-
-	glutMainLoop();
-}
-
 void timerFunc(int notUsed) {
 	glutPostRedisplay();
 }
@@ -116,20 +77,21 @@ void reshape (int w, int h) {
 	height = h;
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
-void step() {
+void display() {
+	glClearColor (0.0,0.0,0.0,1.0);
+	glClear (GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glLoadIdentity();
 	int j,k;
-	Colour red = {1.0,0.0,0.0,0.5};
+	//Colour red = {1.0,0.0,0.0,0.5};
 	glutTimerFunc(TIMERMSECS, timerFunc, 0);
 
-	glClear (GL_COLOR_BUFFER_BIT);
-	glClearColor(0,0,0,1);
-	glLoadIdentity();
-
 	for(k = 0; k<(int)steps; k++) {
-		for(j = 0; j<bodies; ++j) {
+		for(j = 1; j<bodies; ++j) {
 			b[j].acceleration = move(&(b[j]),b,bodies,j);
 		}
-		for(j = 0; j<bodies; ++j) {
+		for(j = 1; j<bodies; ++j) {
 			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 			b[j].path.pos++;
@@ -155,8 +117,12 @@ void traverse(Body *b) {
 		j = i+b->path.pos;
 		PATH_MOD(j);
 		Vector px = coordToScreen(&(b->path.point[j]));
-		Colour faded = fade(&(b->colour),i);
-		//glColour(&faded);
+		glColor4f(
+		          	b->colour.r,
+		          	b->colour.g,
+		          	b->colour.b,
+		          	b->colour.a*((double)i)/((double)PATHLEN)
+		          );
 		glVertex2f(px.x,px.y);
 	}
 	glEnd(); // GL_LINE_STRIP
@@ -165,11 +131,50 @@ void circle(Vector *pos, double r, Colour *c) {
 	double t;
 	Vector sc = coordToScreen(pos);
 	glBegin(GL_TRIANGLE_FAN);
-	glColour(c);
+	glColor4f(c->r,c->g,c->b,c->a);
 	glVertex2f(sc.x,sc.y);
 	r = fmax(r,2);
 	for(t = 0; t < M_PI*2; t += M_PI/72) {
 		glVertex2f(sc.x+sin(t)*r/width, sc.y+cos(t)*r/height);
 	}
 	glEnd();
+}
+
+int main(int argc, char **argv) {
+	if(argc < 2) {
+		printf("Usage: %s numbodies\n",argv[0]);
+		return 1;
+	}
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA/* | GLUT_ALPHA | GLUT_DEPTH | GLUT_STENCIL*/);
+	glutInitWindowSize(WIDTH, HEIGHT);
+	glutInitWindowPosition (0, 0);
+	glutCreateWindow("Yay physics");
+
+	srand(time(NULL));
+
+	bodies = atoi(argv[1]);
+	b = malloc(bodies*sizeof(Body));
+	int i;
+	for(i=0;i<bodies;++i) {
+		b[i] = newBody(
+			newVector(
+				1-2*(float)rand()/(float)RAND_MAX,
+				1-2*(float)rand()/(float)RAND_MAX
+			),
+			newVector(
+				0.002-0.004*(float)rand()/(float)RAND_MAX,
+				0.002-0.004*(float)rand()/(float)RAND_MAX
+			),
+			50*(float)rand()/(float)RAND_MAX
+		);
+	}
+	b[0] = newBody(newVector(0,0.0001),newVector(0,0),5000);
+
+	glutDisplayFunc(display);
+	glutTimerFunc(TIMERMSECS, timerFunc, 0);
+	glutKeyboardFunc(keyPressed);
+	glutReshapeFunc(reshape);
+
+	glutMainLoop();
 }
