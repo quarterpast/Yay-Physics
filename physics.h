@@ -10,6 +10,6 @@ void reshape(int, int);
 void step();
 Vector coordToScreen(Vector*);
 void traverse(Body*);
-void circle(Vector*, double, Colour*);
+void drawCircle(Vector *, double, Colour *);
 
 #endif // PHYSICS_H

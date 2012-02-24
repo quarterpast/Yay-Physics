@@ -4,14 +4,11 @@
 #include <stdio.h>
 #include <math.h>
 
-#ifdef __linux__ // OS
-#include <GL/glut.h>
-#elif defined __APPLE__
-#include <OpenGL/gl.h>
-#include <GLUT/glut.h>
-#else // WINDOWS
-#error Not supported 
-#endif // OS
+#include "openglincludes.h"
+
+#include "vector.h"
+#include "body.h"
+#include "unitcircle.h"
 
 #define WIDTH 750
 #define HEIGHT 750
@@ -29,11 +26,18 @@ int height = HEIGHT;
 int oldwidth = WIDTH;
 int oldheight = HEIGHT;
 
+static Vector *unitCircle;
+static size_t numUnitCircleVertices;
+
 int main(int argc, char **argv) {
 	if(argc < 2) {
 		printf("Usage: %s numbodies\n",argv[0]);
 		return 1;
 	}
+	bodies = atoi(argv[1]);
+
+	init();
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
 	glutInitWindowSize (WIDTH, HEIGHT);
@@ -42,8 +46,19 @@ int main(int argc, char **argv) {
 
 	srand(time(NULL));
 
-	bodies = atoi(argv[1]);
-	b = malloc(bodies*sizeof(Body));
+	glutDisplayFunc(step);
+	glutTimerFunc(TIMERMSECS, timerFunc, 0);
+	glutKeyboardFunc(keyPressed);
+	glutReshapeFunc(reshape);
+
+	glutMainLoop();
+}
+
+void init() {
+	numUnitCircleVertices = 64;
+	unitCircle = generateUnitCircle(numUnitCircleVertices);
+
+	b = (Body *)malloc(bodies*sizeof(Body));
 	int i;
 	//b[0] = newBody(newVector(0,0.0001),newVector(0,0),1000);
 	for(i=0;i<bodies;++i) {
@@ -59,13 +74,6 @@ int main(int argc, char **argv) {
 			100*(float)rand()/(float)RAND_MAX
 		);
 	}
-
-	glutDisplayFunc(step);
-	glutTimerFunc(TIMERMSECS, timerFunc, 0);
-	glutKeyboardFunc(keyPressed);
-	glutReshapeFunc(reshape);
-
-	glutMainLoop();
 }
 
 void timerFunc(int notUsed) {
@@ -139,7 +147,7 @@ void step() {
 	}
 	for(j = 0; j<bodies; ++j) {
 		//if(collide(&(b[j]),b,bodies,j)) b[j].colour = red;
-		circle(&(b[j].position),sqrt(b[j].mass),&(b[j].colour));
+		drawCircle(&(b[j].position), sqrt(b[j].mass), &(b[j].colour));
 		traverse(&(b[j]));
 	}
 	glutSwapBuffers();
@@ -161,15 +169,25 @@ void traverse(Body *b) {
 	}
 	glEnd(); // GL_LINE_STRIP
 }
-void circle(Vector *pos, double r, Colour *c) {
-	double t;
+
+void drawCircle(Vector *pos, double r, Colour *c) {
 	Vector sc = coordToScreen(pos);
-	glBegin(GL_TRIANGLE_FAN);
-	glColour(c);
-	glVertex2f(sc.x,sc.y);
 	r = fmax(r,2);
-	for(t = 0; t < M_PI*2; t += M_PI/72) {
-		glVertex2f(sc.x+sin(t)*r/width, sc.y+cos(t)*r/height);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	//glLoadIdentity();
+
+	glTranslated(sc.x, sc.y, 0.0);
+	glScaled(r / width, r / height, 1.0);
+	
+	glBegin(GL_POLYGON);
+	glColor4dv((double *)c);
+	int i;
+	for (i = 0; i < numUnitCircleVertices; ++i) {
+		glVertex2d(unitCircle[i].x, unitCircle[i].y);
 	}
-	glEnd();
+	glEnd(); //  GL_POLYGON
+	
+	glPopMatrix();
 }
