@@ -101,7 +101,6 @@ void reshape (int w, int h) {
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
 void display() {
-	glClearColor (0.0,0.0,0.0,1.0);
 	glClear (GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 	int j,k;
@@ -188,6 +187,7 @@ int main(int argc, char **argv) {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClearColor (0.0,0.0,0.0,1.0);
 
 	glutDisplayFunc(display);
 	glutTimerFunc(TIMERMSECS, timerFunc, 0);
