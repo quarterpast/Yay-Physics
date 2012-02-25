@@ -30,7 +30,7 @@ Body newBody(Vector pos, Vector vel, double mass) {
 	return out;
 }
 double newt(double m, double r) {
-	return G*m/(r);
+	return G*m/(sqrt(r));
 }
 bool collide(Body *thing, Body *rest, int l, int skip) {
 	int i;

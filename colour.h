@@ -1,8 +1,6 @@
 #ifndef COLOUR_H
 #define COLOUR_H
 
-#define PATHLEN 1000
-
 typedef struct {
 	double r;
 	double g;

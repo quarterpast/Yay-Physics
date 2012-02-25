@@ -30,12 +30,12 @@ static Vector *unitCircle;
 static size_t numUnitCircleVertices;
 
 void init() {
+	srand(time(NULL));
 	numUnitCircleVertices = 64;
 	unitCircle = generateUnitCircle(numUnitCircleVertices);
 
 	b = (Body *)malloc(bodies*sizeof(Body));
 	int i;
-	//b[0] = newBody(newVector(0,0.0001),newVector(0,0),1000);
 	for(i=0;i<bodies;++i) {
 		b[i] = newBody(
 			newVector(
@@ -49,6 +49,7 @@ void init() {
 			100*(float)rand()/(float)RAND_MAX
 		);
 	}
+	b[0] = newBody(newVector(0,0.0001),newVector(0,0),2000);
 }
 
 void timerFunc(int notUsed) {
@@ -135,7 +136,7 @@ Vector coordToScreen(Vector *pos) {
 void traverse(Body *b) {
 	int i,j;
 	glBegin(GL_LINE_STRIP);
-	for(i = 1; i<1000; i++) {
+	for(i = 1; i<PATHLEN; i++) {
 		j = i+b->path.pos;
 		PATH_MOD(j);
 		Vector px = coordToScreen(&(b->path.point[j]));
@@ -186,8 +187,6 @@ int main(int argc, char **argv) {
 	glutInitWindowSize (WIDTH, HEIGHT);
 	glutInitWindowPosition (0, 0);
 	glutCreateWindow("Yay physics");
-
-	srand(time(NULL));
 
 	glutDisplayFunc(display);
 	glutTimerFunc(TIMERMSECS, timerFunc, 0);

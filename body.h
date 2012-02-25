@@ -7,6 +7,8 @@
 #include "vector.h"
 #include "colour.h"
 
+#define PATHLEN 50
+
 typedef struct {
 	Vector *point;
 	size_t pos;
