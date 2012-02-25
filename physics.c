@@ -29,31 +29,6 @@ int oldheight = HEIGHT;
 static Vector *unitCircle;
 static size_t numUnitCircleVertices;
 
-int main(int argc, char **argv) {
-	if(argc < 2) {
-		printf("Usage: %s numbodies\n",argv[0]);
-		return 1;
-	}
-	bodies = atoi(argv[1]);
-
-	init();
-
-	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
-	glutInitWindowSize (WIDTH, HEIGHT);
-	glutInitWindowPosition (0, 0);
-	glutCreateWindow("Yay physics");
-
-	srand(time(NULL));
-
-	glutDisplayFunc(step);
-	glutTimerFunc(TIMERMSECS, timerFunc, 0);
-	glutKeyboardFunc(keyPressed);
-	glutReshapeFunc(reshape);
-
-	glutMainLoop();
-}
-
 void init() {
 	numUnitCircleVertices = 64;
 	unitCircle = generateUnitCircle(numUnitCircleVertices);
@@ -124,20 +99,21 @@ void reshape (int w, int h) {
 	height = h;
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
-void step() {
+void display() {
+	glClearColor (0.0,0.0,0.0,1.0);
+	glClear (GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glLoadIdentity();
 	int j,k;
-	Colour red = {1.0,0.0,0.0,0.5};
+	//Colour red = {1.0,0.0,0.0,0.5};
 	glutTimerFunc(TIMERMSECS, timerFunc, 0);
 
-	glClear (GL_COLOR_BUFFER_BIT);
-	glClearColor(0,0,0,1);
-	glLoadIdentity();
-
 	for(k = 0; k<(int)steps; k++) {
-		for(j = 0; j<bodies; ++j) {
+		for(j = 1; j<bodies; ++j) {
 			b[j].acceleration = move(&(b[j]),b,bodies,j);
 		}
-		for(j = 0; j<bodies; ++j) {
+		for(j = 1; j<bodies; ++j) {
 			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
 			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
 			b[j].path.pos++;
@@ -163,8 +139,12 @@ void traverse(Body *b) {
 		j = i+b->path.pos;
 		PATH_MOD(j);
 		Vector px = coordToScreen(&(b->path.point[j]));
-		Colour faded = fade(&(b->colour),i);
-		//glColour(&faded);
+		glColor4f(
+		          	b->colour.r,
+		          	b->colour.g,
+		          	b->colour.b,
+		          	b->colour.a*((double)i)/((double)PATHLEN)
+		          );
 		glVertex2f(px.x,px.y);
 	}
 	glEnd(); // GL_LINE_STRIP
@@ -190,4 +170,29 @@ void drawCircle(Vector *pos, double r, Colour *c) {
 	glEnd(); //  GL_POLYGON
 	
 	glPopMatrix();
+}
+
+int main(int argc, char **argv) {
+	if(argc < 2) {
+		printf("Usage: %s numbodies\n",argv[0]);
+		return 1;
+	}
+	bodies = atoi(argv[1]);
+
+	init();
+
+	glutInit(&argc, argv);
+	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
+	glutInitWindowSize (WIDTH, HEIGHT);
+	glutInitWindowPosition (0, 0);
+	glutCreateWindow("Yay physics");
+
+	srand(time(NULL));
+
+	glutDisplayFunc(display);
+	glutTimerFunc(TIMERMSECS, timerFunc, 0);
+	glutKeyboardFunc(keyPressed);
+	glutReshapeFunc(reshape);
+
+	glutMainLoop();
 }

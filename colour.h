@@ -10,8 +10,6 @@ typedef struct {
 	double a;
 } Colour;
 
-void glColour(Colour*);
-Colour fade(Colour*,int);
 Colour randColour();
 void printColour(Colour*);
 
