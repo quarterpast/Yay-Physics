@@ -7,7 +7,7 @@
 #include "vector.h"
 #include "colour.h"
 
-#define PATHLEN 500
+#define PATHLEN 200
 
 typedef struct {
 	Vector *point;
@@ -26,6 +26,6 @@ typedef struct {
 Body newBody(Vector, Vector, double);
 double newt(double, double);
 bool collide(Body*, Body*, int, int);
-Vector move(Body*, Body*, int, int);
+Vector move(Body*, Body*, int);
 
 #endif

@@ -46,21 +46,21 @@ bool collide(Body *thing, Body *rest, int l, int skip) {
 	}
 	return false;
 }
-Vector move(Body* thing, Body* rest, int l, int skip) {
-	int i;
+Vector move(Body* thing, Body* rest, int l) {
 	double n, r;
 	Vector ds = {0,0}, diff, u ,m;
 	Body b;
-	for(i=0; i<l; ++i) {
-		if(i == skip) continue;
-		b = rest[i];
-		r = distance(&(thing->position),&(b.position));
-		n = newt(rest[i].mass,r);
-		diff = vminus(&(b.position),&(thing->position));
+	Body *restEnd = rest + l;
+	for(; rest != restEnd; ++rest) {
+		if (rest == thing) continue;
+		b = *rest;
+		r = distance(&(thing->position), &(b.position));
+		n = newt(rest->mass, r);
+		diff = vminus(&(b.position), &(thing->position));
 
 		u = unit(&diff);
-		m = smult(n,&u);
-		ds = vplus(&ds,&m);
+		m = smult(n, &u);
+		ds = vplus(&ds, &m);
 	}
 	return ds;
 }

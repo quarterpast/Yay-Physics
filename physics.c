@@ -103,26 +103,31 @@ void reshape (int w, int h) {
 void display() {
 	glClear (GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
-	int j,k;
+	int k, j;
+	Body *bp;
+	Body *bBegin;
+	Body *bEnd;
 	//Colour red = {1.0,0.0,0.0,0.5};
 	glutTimerFunc(TIMERMSECS, timerFunc, 0);
 
-	for(k = 0; k<(int)steps; k++) {
-		for(j = 1; j<bodies; ++j) {
-			b[j].acceleration = move(&(b[j]),b,bodies,j);
+	bBegin = b + 1;
+	bEnd = b + bodies;
+	for(k = 0; k < (int)steps; ++k) {
+		for(bp = bBegin, j = 1; bp != bEnd; ++bp, ++j) {
+			bp->acceleration = move(bp, b, bodies);
 		}
-		for(j = 1; j<bodies; ++j) {
-			b[j].velocity = vplus(&(b[j].velocity),&(b[j].acceleration));
-			b[j].position = vplus(&(b[j].position),&(b[j].velocity));
-			b[j].path.pos++;
-			PATH_MOD(b[j].path.pos);
-			b[j].path.point[b[j].path.pos] = b[j].position;
+		for(bp = bBegin; bp != bEnd; ++bp) {
+			bp->velocity = vplus(&(bp->velocity), &(bp->acceleration));
+			bp->position = vplus(&(bp->position), &(bp->velocity));
+			bp->path.pos++;
+			PATH_MOD(bp->path.pos);
+			bp->path.point[bp->path.pos] = bp->position;
 		}
 	}
-	for(j = 0; j<bodies; ++j) {
+	for(bp = b; bp != bEnd; ++bp) {
 		//if(collide(&(b[j]),b,bodies,j)) b[j].colour = red;
-		drawCircle(&(b[j].position), sqrt(b[j].mass), &(b[j].colour));
-		traverse(&(b[j]));
+		drawCircle(&(bp->position), sqrt(bp->mass), &(bp->colour));
+		traverse(bp);
 	}
 	glutSwapBuffers();
 }
