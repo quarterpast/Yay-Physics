@@ -1,203 +1,265 @@
 #include "physics.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-
-#include "openglincludes.h"
-
-#include "vector.h"
-#include "body.h"
-#include "unitcircle.h"
-
-#define WIDTH 750
-#define HEIGHT 750
-
-#define TIMERMSECS 10
-#define STEP 1.2
-
-#define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
-
-Body *b;
-int bodies;
+int bodyTotal;
+Body *bodyArray;
 double steps = 2.0;
-int width = WIDTH;
-int height = HEIGHT;
-int oldwidth = WIDTH;
-int oldheight = HEIGHT;
+double speed = 0.01;
+Vector heading, left, up, cpos, target;
+double ctheta, stheta;
 
-static Vector *unitCircle;
-static size_t numUnitCircleVertices;
-
-void init() {
-	srand(time(NULL));
-	numUnitCircleVertices = 64;
-	unitCircle = generateUnitCircle(numUnitCircleVertices);
-
-	b = (Body *)malloc(bodies*sizeof(Body));
-	int i;
-	for(i=0;i<bodies;++i) {
-		b[i] = newBody(
-			newVector(
-				1-2*(float)rand()/(float)RAND_MAX,
-				1-2*(float)rand()/(float)RAND_MAX
-			),
-			newVector(
-				0.002-0.004*(float)rand()/(float)RAND_MAX,
-				0.002-0.004*(float)rand()/(float)RAND_MAX
-			),
-			100*(float)rand()/(float)RAND_MAX
-		);
-	}
-	b[0] = newBody(newVector(0,0.0001),newVector(0,0),2000);
-}
 
 void timerFunc(int notUsed) {
-	glutPostRedisplay();
+	Vector temp = smult (speed, &heading);
+	cpos = vplus (&cpos, &temp);
+	target = vplus (&cpos, &temp);
+	glutPostRedisplay ();
 }
 
-/* GL/GLUT stuff */
-void keyPressed (unsigned char key, int x, int y) {
-	printf("%c\n",key);
-	if(key == 'f') {
-		#ifdef __FREEGLUT_STD_H__
-		glutFullScreenToggle();
-		#else
-		if(
-			glutGet(GLUT_WINDOW_WIDTH) == glutGet(GLUT_SCREEN_WIDTH) &&
-			glutGet(GLUT_WINDOW_HEIGHT) == glutGet(GLUT_SCREEN_HEIGHT) &&
-			glutGet(GLUT_WINDOW_X) == 0 &&
-			glutGet(GLUT_WINDOW_Y) == 0
-		) {
-			glutReshapeWindow(oldwidth,oldheight);
-		} else {
-			glutFullScreen();
+void reshape (int width, int height) {
+
+	if (height == 0) height = 1;
+	glViewport (0, 0, (GLsizei)width, (GLsizei)height);
+	glMatrixMode (GL_PROJECTION);
+	glLoadIdentity ();
+	gluPerspective (45.0f, (GLfloat)width / (GLfloat)height, 0.01f, 100.0f);
+	glMatrixMode (GL_MODELVIEW);
+}
+
+void keyboard (unsigned char key, int x, int y) {
+
+	switch (key) {
+		case 27:
+			exit(0);
+			break;
+		case 'W':
+		case 'w':
+			speed += 0.02;
+			break;
+		case 'S':
+		case 's':
+			speed -= 0.02;
+			if (speed < 0.02) speed = 0.0000000001; 
+			break;
+		case 'R':
+		case 'r':
+			steps = 2.0;
+			speed = 0.01;
+			initialiseArray ();
+		case 'V':
+		case 'v':
+			heading = newVector (0, 0, -1);
+			left = newVector (-1, 0, 0);
+			up = newVector (0, 1, 0);
+			cpos = newVector (0, 0, 10);
+			target = vplus (&cpos, &heading);
+			break;
+		case '+':
+			steps *= STEP;
+			break;
+		case '-':
+			steps /= STEP;
+			if(steps < 1) steps = 1;
+			break;
+		case ',': {
+			Vector temp, temp1, temp2;
+			temp1 = smult (ctheta, &heading);
+			temp2 = smult (stheta, &left);
+			temp = vplus (&temp1, &temp2);
+			temp1 = smult (stheta, &heading);
+			temp2 = smult (ctheta, &left);
+			left = vminus (&temp2, &temp1);
+			heading = temp;
+			target = vplus (&cpos, &heading);
+			break;
 		}
-		#endif
-	}
-	if(key == 'q') {
-		#ifdef __FREEGLUT_STD_H__
-		glutLeaveMainLoop();
-		#else
-		exit(0);// lol
-		#endif
-	}
-	if(key == '+') {
-		steps *= STEP;
-	}
-	if(key == '-') {
-		steps /= STEP;
-		if(steps < 1) steps = 1;
-	}
-	if(key == '\x1e') {
-		// glutLeaveFullScreen();
+		case '.': {
+			Vector temp, temp1, temp2;
+			temp1 = smult (ctheta, &heading);
+			temp2 = smult (stheta, &left);
+			temp = vminus (&temp1, &temp2);
+			temp1 = smult (stheta, &heading);
+			temp2 = smult (ctheta, &left);
+			left = vplus (&temp1, &temp2);
+			heading = temp;
+			target = vplus (&cpos, &heading);
+			break;
+		}
+		default:
+			break;
 	}
 }
-void reshape (int w, int h) {
-	oldwidth = width;
-	oldheight = height;
-	width = w;
-	height = h;
-	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+
+void special (int key, int x, int y) {
+	
+	switch (key) {
+		Vector temp, temp1, temp2;
+		case GLUT_KEY_UP:
+			temp1 = smult (ctheta, &heading);
+			temp2 = smult (stheta, &up);
+			temp = vminus (&temp1, &temp2);
+			temp1 = smult (stheta, &heading);
+			temp2 = smult (ctheta, &up);
+			up = vplus (&temp1, &temp2);
+			heading = temp;
+			target = vplus (&cpos, &heading);
+			break;
+		case GLUT_KEY_DOWN:
+			temp1 = smult (ctheta, &heading);
+			temp2 = smult (stheta, &up);
+			temp = vplus (&temp1, &temp2);
+			temp1 = smult (stheta, &heading);
+			temp2 = smult (ctheta, &up);
+			up = vminus (&temp2, &temp1);
+			heading = temp;
+			target = vplus (&cpos, &heading);
+			break;
+		case GLUT_KEY_LEFT:
+			temp1 = smult (ctheta, &left);
+			temp2 = smult (stheta, &up);
+			temp = vminus (&temp1, &temp2);
+			temp1 = smult (stheta, &left);
+			temp2 = smult (ctheta, &up);
+			up = vplus (&temp1, &temp2);
+			left = temp;
+			break;
+		case GLUT_KEY_RIGHT:
+			temp1 = smult (ctheta, &left);
+			temp2 = smult (stheta, &up);
+			temp = vplus (&temp1, &temp2);
+			temp1 = smult (stheta, &left);
+			temp2 = smult (ctheta, &up);
+			up = vminus (&temp2, &temp1);
+			left = temp;
+			break;
+		case GLUT_KEY_PAGE_UP:
+			cpos = target;
+			target = vplus (&cpos, &heading);
+			break;
+		case GLUT_KEY_PAGE_DOWN:
+			target = cpos;
+			cpos = vminus (&target, &heading);
+			break;
+		default:
+			return;
+	}
 }
-void display() {
-	glClear (GL_COLOR_BUFFER_BIT);
-	glLoadIdentity();
-	int k, j;
+
+void display (void) {
+
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glLoadIdentity ();
+	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, up.x, up.y, up.z);
+	int k;
 	Body *bp;
 	Body *bBegin;
 	Body *bEnd;
-	//Colour red = {1.0,0.0,0.0,0.5};
-	glutTimerFunc(TIMERMSECS, timerFunc, 0);
-
-	bBegin = b + 1;
-	bEnd = b + bodies;
-	for(k = 0; k < (int)steps; ++k) {
-		for(bp = bBegin, j = 1; bp != bEnd; ++bp, ++j) {
-			bp->acceleration = move(bp, b, bodies);
+	glutTimerFunc (TIMERMSECS, timerFunc, 0);
+	bBegin = bodyArray;
+	bEnd = bodyArray + bodyTotal;
+	for (k = 0; k < (int)steps; ++k) {
+		for (bp = bBegin; bp != bEnd; ++bp) {
+			bp->acceleration = move (bp, bodyArray, bodyTotal);
 		}
-		for(bp = bBegin; bp != bEnd; ++bp) {
-			bp->velocity = vplus(&(bp->velocity), &(bp->acceleration));
-			bp->position = vplus(&(bp->position), &(bp->velocity));
+		for (bp = bBegin; bp != bEnd; ++bp) {
+			bp->velocity = vplus (&(bp->velocity), &(bp->acceleration));
+			bp->position = vplus (&(bp->position), &(bp->velocity));
 			bp->path.pos++;
-			PATH_MOD(bp->path.pos);
+			PATH_MOD (bp->path.pos);
 			bp->path.point[bp->path.pos] = bp->position;
 		}
 	}
-	for(bp = b; bp != bEnd; ++bp) {
-		//if(collide(&(b[j]),b,bodies,j)) b[j].colour = red;
-		drawCircle(&(bp->position), sqrt(bp->mass), &(bp->colour));
-		traverse(bp);
+	for (bp = bBegin; bp != bEnd; ++bp) {
+		drawBody (&(bp->position), sqrt (bp->mass), &(bp->colour));
+		drawPath (bp);
 	}
-	glutSwapBuffers();
+	glutSwapBuffers ();
 }
-Vector coordToScreen(Vector *pos) {
-	Vector out = { pos->x*WIDTH/width, pos->y*HEIGHT/height };
-	return out;
+
+void drawBody (Vector *pos, double r, Vector *c) {
+
+	r /= 100;
+	glPushMatrix ();
+	glTranslated (pos->x, pos->y, pos->z);
+	glScaled (r, r, r);
+	glColor3dv ((double *)c);
+	glCallList (1);
+	glPopMatrix ();
 }
-void traverse(Body *b) {
-	int i,j;
-	glBegin(GL_LINE_STRIP);
-	for(i = 1; i<PATHLEN; i++) {
-		j = i+b->path.pos;
-		PATH_MOD(j);
-		Vector px = coordToScreen(&(b->path.point[j]));
-		glColor4f(
-		          	b->colour.r,
-		          	b->colour.g,
-		          	b->colour.b,
-		          	b->colour.a*((double)i)/((double)PATHLEN)
-		          );
-		glVertex2f(px.x,px.y);
+
+void drawPath (Body *b) {
+
+	int i, j;
+	glBegin (GL_LINE_STRIP);
+	for (i = 1; i < PATHLEN; ++i) {
+		j = i + b->path.pos;
+		PATH_MOD (j);
+		glColor4f (b->colour.x, b->colour.y, b->colour.z, (double)i / (double)PATHLEN);
+		glVertex3f (b->path.point[j].x, b->path.point[j].y, b->path.point[j].z);
 	}
-	glEnd(); // GL_LINE_STRIP
+	glEnd (); 
 }
 
-void drawCircle(Vector *pos, double r, Colour *c) {
-	Vector sc = coordToScreen(pos);
-	r = fmax(r,2);
+void initialiseSettings (void) {
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	//glLoadIdentity();
+	glClearColor (0.0, 0.0, 0.0, 0.0);
+	glEnable (GL_DEPTH_TEST);
+	glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
+	glEnable (GL_BLEND);
+	glCullFace (GL_BACK);
+	glEnable (GL_CULL_FACE);
+	glNewList (1, GL_COMPILE);
+	glutSolidSphere (1, 10, 10);
+	glEndList ();
+	heading = newVector (0, 0, -1);
+	left = newVector (-1, 0, 0);
+	up = newVector (0, 1, 0);
+	cpos = newVector (0, 0, 10);
+	target = vplus (&cpos, &heading);
+	ctheta = cos (TURN_ANGLE);
+	stheta = sin (TURN_ANGLE);
+}
 
-	glTranslated(sc.x, sc.y, 0.0);
-	glScaled(r / width, r / height, 1.0);
-	
-	glBegin(GL_POLYGON);
-	glColor4dv((double *)c);
+void initialiseArray (void) {
+
 	int i;
-	for (i = 0; i < numUnitCircleVertices; ++i) {
-		glVertex2d(unitCircle[i].x, unitCircle[i].y);
+	double posrep = 2.0 / RAND_MAX;
+	double velrep = 0.004 / RAND_MAX;
+	for (i = 0; i < bodyTotal; ++i) {
+		bodyArray[i] = newBody (
+			newVector (
+				1.0 - posrep * rand (),
+				1.0 - posrep * rand (),
+				1.0 - posrep * rand ()
+			),
+			newVector (
+				0.002 - velrep * rand (),
+				0.002 - velrep * rand (),
+				0.002 - velrep * rand ()
+			),
+			100.0 * rand() / RAND_MAX
+		);
 	}
-	glEnd(); //  GL_POLYGON
-	
-	glPopMatrix();
 }
 
-int main(int argc, char **argv) {
-	if(argc < 2) {
-		printf("Usage: %s numbodies\n",argv[0]);
-		return 1;
+int main (int argc, char **argv) {
+
+	glutInit (&argc, argv);
+	glutInitDisplayMode (GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowSize (INIT_WIN_WIDTH, INIT_WIN_HEIGHT);
+	glutInitWindowPosition (100, 100);
+	glutCreateWindow ("Physics Fork");
+	glutDisplayFunc (display);
+	glutReshapeFunc (reshape);
+	glutKeyboardFunc (keyboard);
+	glutSpecialFunc (special);
+	if(argc != 2) {
+		printf("Usage: %s numbodies; Continuing with 100\n",argv[0]);
+		bodyTotal = 100;
 	}
-	bodies = atoi(argv[1]);
-
-	init();
-
-	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
-	glutInitWindowSize (WIDTH, HEIGHT);
-	glutInitWindowPosition (0, 0);
-	glutCreateWindow("Yay physics");
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClearColor (0.0,0.0,0.0,1.0);
-
-	glutDisplayFunc(display);
-	glutTimerFunc(TIMERMSECS, timerFunc, 0);
-	glutKeyboardFunc(keyPressed);
-	glutReshapeFunc(reshape);
-
-	glutMainLoop();
+	else bodyTotal = atoi(argv[1]);
+	bodyArray = malloc (bodyTotal * sizeof (Body));
+	initialiseArray ();
+ 	initialiseSettings ();
+	glutMainLoop ();
+	return 0;
 }

@@ -2,12 +2,11 @@
 #define BODY_H
 
 #include <sys/types.h>
-#include <stdbool.h>
-
+#include <stdlib.h>
 #include "vector.h"
-#include "colour.h"
 
 #define PATHLEN 200
+#define G 1e-8
 
 typedef struct {
 	Vector *point;
@@ -20,12 +19,12 @@ typedef struct {
 	Vector acceleration;
 	double mass;
 	Path path;
-	Colour colour;
+	Vector colour;
 } Body;
 
-Body newBody(Vector, Vector, double);
-double newt(double, double);
-bool collide(Body*, Body*, int, int);
-Vector move(Body*, Body*, int);
+Body newBody (Vector, Vector, double);
+double newt (double, double);
+Vector move (Body*, Body*, int);
+Vector bodyColour (void);
 
 #endif
