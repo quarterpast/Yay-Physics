@@ -6,6 +6,8 @@ Hlu camera;
 double steps = 2.0;
 double speed = 0.01;
 Vector cpos, target;
+bool keyStates[256];
+bool specialStates[256];
 
 void timerFunc (int notUsed) {
 
@@ -27,76 +29,78 @@ void reshape (int width, int height) {
 
 void keyboard (unsigned char key, int x, int y) {
 
-	switch (key) {
-		case 27:
-			exit(0);
-			break;
-		case 'W':
-		case 'w':
-			speed += 0.02;
-			break;
-		case 'S':
-		case 's':
-			speed -= 0.02;
-			if (speed < 0.02) speed = 0.0000000001; 
-			break;
-		case 'R':
-		case 'r':
-			steps = 2.0;
-			speed = 0.01;
-			initialiseArray ();
-		case 'V':
-		case 'v':
-			camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
-			cpos = newVector (0, 0, 10);
-			target = vplus (&cpos, &(camera.heading));
-			break;
-		case '+':
-			steps *= STEP;
-			break;
-		case '-':
-			steps /= STEP;
-			if(steps < 1) steps = 1;
-			break;
-		case ',': {
-			yawLeft (&camera);
-			target = vplus (&cpos, &(camera.heading));
-			break;
-		}
-		case '.': {
-			yawRight (&camera);
-			target = vplus (&cpos, &(camera.heading));
-			break;
-		}
-		default:
-			break;
+	keyStates[key] = true;
+}
+
+void keyboardUp (unsigned char key, int x, int y) {
+
+	keyStates[key] = false;
+}
+
+void keyboardOperations (void) {
+
+	if (keyStates[27]) exit(0);
+	if (keyStates['W'] || keyStates['w']) speed += 0.02;
+	if (keyStates['S'] || keyStates['s']) {
+		speed -= 0.02;
+		if (speed < 0.02) speed = 0.0000000001; 
+	}
+	if (keyStates['R'] || keyStates['r']) {
+		steps = 2.0;
+		speed = 0.01;
+		initialiseArray ();
+		camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
+		cpos = newVector (0, 0, 10);
+		target = vplus (&cpos, &(camera.heading));
+	}
+	if (keyStates['V'] || keyStates['v']) {
+		camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
+		cpos = newVector (0, 0, 10);
+		target = vplus (&cpos, &(camera.heading));
+	}
+	if (keyStates['+']) steps *= STEP;
+	if (keyStates['-']) {
+		steps /= STEP;
+		if(steps < 1) steps = 1;
+	}
+	if (keyStates[',']) {
+		yawLeft (&camera);
+		target = vplus (&cpos, &(camera.heading));
+	}
+	if (keyStates['.']) {
+		yawRight (&camera);
+		target = vplus (&cpos, &(camera.heading));
 	}
 }
 
 void special (int key, int x, int y) {
 	
-	switch (key) {
-		case GLUT_KEY_UP:
-			pitchDown (&camera);
-			target = vplus (&cpos, &(camera.heading));
-			break;
-		case GLUT_KEY_DOWN:
-			pitchUp (&camera);
-			target = vplus (&cpos, &(camera.heading));
-			break;
-		case GLUT_KEY_LEFT:
-			rollLeft (&camera);
-			break;
-		case GLUT_KEY_RIGHT:
-			rollRight (&camera);
-			break;
-		default:
-			return;
+	specialStates[key] = true;
+}
+
+void specialUp (int key, int x, int y) {
+
+	specialStates[key] = false;
+}
+
+void specialOperations (void) {
+
+	if (specialStates[GLUT_KEY_UP]) {
+		pitchDown (&camera);
+		target = vplus (&cpos, &(camera.heading));
 	}
+	if (specialStates[GLUT_KEY_DOWN]) {
+		pitchUp (&camera);
+		target = vplus (&cpos, &(camera.heading));
+	}
+	if (specialStates[GLUT_KEY_LEFT]) rollLeft (&camera);
+	if (specialStates[GLUT_KEY_RIGHT]) rollRight (&camera);
 }
 
 void display (void) {
 
+	keyboardOperations ();
+	specialOperations ();
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
@@ -198,7 +202,9 @@ int main (int argc, char **argv) {
 	glutDisplayFunc (display);
 	glutReshapeFunc (reshape);
 	glutKeyboardFunc (keyboard);
+	glutKeyboardUpFunc (keyboardUp);
 	glutSpecialFunc (special);
+	glutSpecialUpFunc (specialUp);
 	if(argc != 2) {
 		printf("Usage: %s numbodies; Continuing with 100\n",argv[0]);
 		bodyTotal = 100;
