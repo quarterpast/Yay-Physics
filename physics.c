@@ -8,12 +8,16 @@ double speed = 0.01;
 Vector cpos, target;
 bool keyStates[256];
 bool specialStates[256];
+int viewDirection = 1;
 
 void timerFunc (int notUsed) {
 
 	Vector temp = smult (speed, &(camera.heading));
 	cpos = vplus (&cpos, &temp);
-	target = vplus (&cpos, &temp);
+	if (viewDirection == 1) target = vplus (&cpos, &temp);
+	else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+	else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+	else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	glutPostRedisplay ();
 }
 
@@ -52,11 +56,13 @@ void keyboardOperations (void) {
 		camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
 		cpos = newVector (0, 0, 10);
 		target = vplus (&cpos, &(camera.heading));
+		viewDirection = 1;
 	}
 	if (keyStates['V'] || keyStates['v']) {
 		camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
 		cpos = newVector (0, 0, 10);
 		target = vplus (&cpos, &(camera.heading));
+		viewDirection = 1;
 	}
 	if (keyStates['+']) steps *= STEP;
 	if (keyStates['-']) {
@@ -65,12 +71,22 @@ void keyboardOperations (void) {
 	}
 	if (keyStates[',']) {
 		yawLeft (&camera);
-		target = vplus (&cpos, &(camera.heading));
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	}
 	if (keyStates['.']) {
 		yawRight (&camera);
-		target = vplus (&cpos, &(camera.heading));
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	}
+	if (keyStates['1']) viewDirection = 1;
+	if (keyStates['2']) viewDirection = 2;
+	if (keyStates['3']) viewDirection = 3;
+	if (keyStates['4']) viewDirection = 4;
 }
 
 void special (int key, int x, int y) {
@@ -87,14 +103,24 @@ void specialOperations (void) {
 
 	if (specialStates[GLUT_KEY_UP]) {
 		pitchDown (&camera);
-		target = vplus (&cpos, &(camera.heading));
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
 	}
 	if (specialStates[GLUT_KEY_DOWN]) {
 		pitchUp (&camera);
-		target = vplus (&cpos, &(camera.heading));
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
 	}
-	if (specialStates[GLUT_KEY_LEFT]) rollLeft (&camera);
-	if (specialStates[GLUT_KEY_RIGHT]) rollRight (&camera);
+	if (specialStates[GLUT_KEY_LEFT]) {
+		rollLeft (&camera);
+		if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	}
+	if (specialStates[GLUT_KEY_RIGHT]) {
+		rollRight (&camera);
+		if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	}
 }
 
 void display (void) {
