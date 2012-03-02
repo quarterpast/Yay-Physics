@@ -7,7 +7,7 @@ else
 endif
 
 all:
-	gcc -o PhysicsFork physics.c body.c vector.c $(CFLAGS)
+	gcc -o PhysicsFork physics.c body.c vector.c hlu.c $(CFLAGS)
 
 clean:
 	rm PhysicsFork

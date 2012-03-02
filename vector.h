@@ -13,7 +13,7 @@ Vector newVector (double, double, double);
 Vector vplus (Vector*, Vector*);
 Vector vminus (Vector*, Vector*);
 Vector smult (double, Vector*);
-double norm (Vector *);
+double norm (Vector*);
 double distance (Vector*, Vector*);
 Vector unit (Vector*);
 

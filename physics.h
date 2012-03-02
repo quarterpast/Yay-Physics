@@ -14,12 +14,12 @@
 #include <math.h>
 #include "vector.h"
 #include "body.h"
+#include "hlu.h"
 
 #define INIT_WIN_WIDTH 640
 #define INIT_WIN_HEIGHT 480
 #define TIMERMSECS 10
 #define STEP 1.2
-#define TURN_ANGLE 0.01
 #define PATH_MOD(t) { if (t >= PATHLEN) t -= PATHLEN;}
 
 void timerFunc (int);

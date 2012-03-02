@@ -2,14 +2,14 @@
 
 int bodyTotal;
 Body *bodyArray;
+Hlu camera;
 double steps = 2.0;
 double speed = 0.01;
-Vector heading, left, up, cpos, target;
-double ctheta, stheta;
+Vector cpos, target;
 
+void timerFunc (int notUsed) {
 
-void timerFunc(int notUsed) {
-	Vector temp = smult (speed, &heading);
+	Vector temp = smult (speed, &(camera.heading));
 	cpos = vplus (&cpos, &temp);
 	target = vplus (&cpos, &temp);
 	glutPostRedisplay ();
@@ -47,11 +47,9 @@ void keyboard (unsigned char key, int x, int y) {
 			initialiseArray ();
 		case 'V':
 		case 'v':
-			heading = newVector (0, 0, -1);
-			left = newVector (-1, 0, 0);
-			up = newVector (0, 1, 0);
+			camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
 			cpos = newVector (0, 0, 10);
-			target = vplus (&cpos, &heading);
+			target = vplus (&cpos, &(camera.heading));
 			break;
 		case '+':
 			steps *= STEP;
@@ -61,27 +59,13 @@ void keyboard (unsigned char key, int x, int y) {
 			if(steps < 1) steps = 1;
 			break;
 		case ',': {
-			Vector temp, temp1, temp2;
-			temp1 = smult (ctheta, &heading);
-			temp2 = smult (stheta, &left);
-			temp = vplus (&temp1, &temp2);
-			temp1 = smult (stheta, &heading);
-			temp2 = smult (ctheta, &left);
-			left = vminus (&temp2, &temp1);
-			heading = temp;
-			target = vplus (&cpos, &heading);
+			yawLeft (&camera);
+			target = vplus (&cpos, &(camera.heading));
 			break;
 		}
 		case '.': {
-			Vector temp, temp1, temp2;
-			temp1 = smult (ctheta, &heading);
-			temp2 = smult (stheta, &left);
-			temp = vminus (&temp1, &temp2);
-			temp1 = smult (stheta, &heading);
-			temp2 = smult (ctheta, &left);
-			left = vplus (&temp1, &temp2);
-			heading = temp;
-			target = vplus (&cpos, &heading);
+			yawRight (&camera);
+			target = vplus (&cpos, &(camera.heading));
 			break;
 		}
 		default:
@@ -92,52 +76,19 @@ void keyboard (unsigned char key, int x, int y) {
 void special (int key, int x, int y) {
 	
 	switch (key) {
-		Vector temp, temp1, temp2;
 		case GLUT_KEY_UP:
-			temp1 = smult (ctheta, &heading);
-			temp2 = smult (stheta, &up);
-			temp = vminus (&temp1, &temp2);
-			temp1 = smult (stheta, &heading);
-			temp2 = smult (ctheta, &up);
-			up = vplus (&temp1, &temp2);
-			heading = temp;
-			target = vplus (&cpos, &heading);
+			pitchDown (&camera);
+			target = vplus (&cpos, &(camera.heading));
 			break;
 		case GLUT_KEY_DOWN:
-			temp1 = smult (ctheta, &heading);
-			temp2 = smult (stheta, &up);
-			temp = vplus (&temp1, &temp2);
-			temp1 = smult (stheta, &heading);
-			temp2 = smult (ctheta, &up);
-			up = vminus (&temp2, &temp1);
-			heading = temp;
-			target = vplus (&cpos, &heading);
+			pitchUp (&camera);
+			target = vplus (&cpos, &(camera.heading));
 			break;
 		case GLUT_KEY_LEFT:
-			temp1 = smult (ctheta, &left);
-			temp2 = smult (stheta, &up);
-			temp = vminus (&temp1, &temp2);
-			temp1 = smult (stheta, &left);
-			temp2 = smult (ctheta, &up);
-			up = vplus (&temp1, &temp2);
-			left = temp;
+			rollLeft (&camera);
 			break;
 		case GLUT_KEY_RIGHT:
-			temp1 = smult (ctheta, &left);
-			temp2 = smult (stheta, &up);
-			temp = vplus (&temp1, &temp2);
-			temp1 = smult (stheta, &left);
-			temp2 = smult (ctheta, &up);
-			up = vminus (&temp2, &temp1);
-			left = temp;
-			break;
-		case GLUT_KEY_PAGE_UP:
-			cpos = target;
-			target = vplus (&cpos, &heading);
-			break;
-		case GLUT_KEY_PAGE_DOWN:
-			target = cpos;
-			cpos = vminus (&target, &heading);
+			rollRight (&camera);
 			break;
 		default:
 			return;
@@ -148,7 +99,7 @@ void display (void) {
 
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
-	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, up.x, up.y, up.z);
+	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
 	int k;
 	Body *bp;
 	Body *bBegin;
@@ -210,13 +161,9 @@ void initialiseSettings (void) {
 	glNewList (1, GL_COMPILE);
 	glutSolidSphere (1, 10, 10);
 	glEndList ();
-	heading = newVector (0, 0, -1);
-	left = newVector (-1, 0, 0);
-	up = newVector (0, 1, 0);
+	camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
 	cpos = newVector (0, 0, 10);
-	target = vplus (&cpos, &heading);
-	ctheta = cos (TURN_ANGLE);
-	stheta = sin (TURN_ANGLE);
+	target = vplus (&cpos, &(camera.heading));
 }
 
 void initialiseArray (void) {
