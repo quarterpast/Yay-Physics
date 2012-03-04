@@ -4,7 +4,7 @@
 #include <math.h>
 #include "vector.h"
 
-#define TURN_ANGLE 0.01
+#define TURN_ANGLE 0.02
 #define CTHETA (cos (TURN_ANGLE))
 #define STHETA (sin (TURN_ANGLE))
 

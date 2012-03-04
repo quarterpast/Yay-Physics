@@ -4,20 +4,22 @@ int bodyTotal;
 Body *bodyArray;
 Hlu camera;
 double steps = 2.0;
-double speed = 0.01;
+double speed = 0.0;
 Vector cpos, target;
 bool keyStates[256];
 bool specialStates[256];
-int viewDirection = 1;
+int viewDirection;
 
 void timerFunc (int notUsed) {
 
-	Vector temp = smult (speed, &(camera.heading));
-	cpos = vplus (&cpos, &temp);
-	if (viewDirection == 1) target = vplus (&cpos, &temp);
-	else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
-	else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
-	else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	if (speed != 0.0) {
+		Vector temp = smult (speed, &(camera.heading));
+		cpos = vplus (&cpos, &temp);
+		if (viewDirection == 1) target = vplus (&cpos, &temp);
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	}
 	glutPostRedisplay ();
 }
 
@@ -47,22 +49,16 @@ void keyboardOperations (void) {
 	if (keyStates['W'] || keyStates['w']) speed += 0.02;
 	if (keyStates['S'] || keyStates['s']) {
 		speed -= 0.02;
-		if (speed < 0.02) speed = 0.0000000001; 
+		if (speed < 0.01) speed = 0.0; 
 	}
 	if (keyStates['R'] || keyStates['r']) {
 		steps = 2.0;
-		speed = 0.01;
+		speed = 0.0;
+		initialiseSettings ();
 		initialiseArray ();
-		camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
-		cpos = newVector (0, 0, 10);
-		target = vplus (&cpos, &(camera.heading));
-		viewDirection = 1;
 	}
 	if (keyStates['V'] || keyStates['v']) {
-		camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
-		cpos = newVector (0, 0, 10);
-		target = vplus (&cpos, &(camera.heading));
-		viewDirection = 1;
+		initialiseSettings ();
 	}
 	if (keyStates['+']) steps *= STEP;
 	if (keyStates['-']) {
@@ -180,20 +176,38 @@ void drawPath (Body *b) {
 	glEnd (); 
 }
 
-void initialiseSettings (void) {
+void initialiseGL (void) {
 
+	srand (time (NULL));
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glEnable (GL_DEPTH_TEST);
 	glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
 	glEnable (GL_BLEND);
 	glCullFace (GL_BACK);
 	glEnable (GL_CULL_FACE);
+	glEnable (GL_LIGHTING);
+	glEnable (GL_LIGHT0);
+	glEnable (GL_COLOR_MATERIAL);
+	float light_pos[] = {100, 100, 100, 1};
+	float light_ambient[] = {0.3, 0.3, 0.3, 1};
+	float light_diffuse[] = {0.1, 0.1, 0.1, 1};
+	float light_specular[] = {0, 0, 0, 1};
+	glLightfv (GL_LIGHT0, GL_POSITION, light_pos);
+	glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
+	glMaterialf (GL_FRONT, GL_SHININESS, 128);
 	glNewList (1, GL_COMPILE);
-	glutSolidSphere (1, 10, 10);
+	glutSolidSphere (1, 15, 15);
 	glEndList ();
+}
+
+void initialiseSettings (void) {
+
 	camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
 	cpos = newVector (0, 0, 10);
 	target = vplus (&cpos, &(camera.heading));
+	viewDirection = 1;	
 }
 
 void initialiseArray (void) {
@@ -203,16 +217,8 @@ void initialiseArray (void) {
 	double velrep = 0.004 / RAND_MAX;
 	for (i = 0; i < bodyTotal; ++i) {
 		bodyArray[i] = newBody (
-			newVector (
-				1.0 - posrep * rand (),
-				1.0 - posrep * rand (),
-				1.0 - posrep * rand ()
-			),
-			newVector (
-				0.002 - velrep * rand (),
-				0.002 - velrep * rand (),
-				0.002 - velrep * rand ()
-			),
+			newVector (1.0 - posrep * rand (), 1.0 - posrep * rand (), 1.0 - posrep * rand ()),
+			newVector (0.002 - velrep * rand (), 0.002 - velrep * rand (), 0.002 - velrep * rand ()),
 			100.0 * rand() / RAND_MAX
 		);
 	}
@@ -237,6 +243,7 @@ int main (int argc, char **argv) {
 	}
 	else bodyTotal = atoi(argv[1]);
 	bodyArray = malloc (bodyTotal * sizeof (Body));
+	initialiseGL ();
 	initialiseArray ();
  	initialiseSettings ();
 	glutMainLoop ();

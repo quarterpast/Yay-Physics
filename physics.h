@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
+#include <time.h>
 #include "vector.h"
 #include "body.h"
 #include "hlu.h"
@@ -33,7 +34,8 @@ void specialUp (int, int, int);
 void specialOperations (void);
 void display (void);
 void drawBody (Vector *, double, Vector *);
-void drawPath (Body *b);
+void drawPath (Body *);
+void initialiseGL (void);
 void initialiseSettings (void);
 void initialiseArray (void);
 
