@@ -15,11 +15,11 @@ void timerFunc (int notUsed) {
 	if (speed != 0.0) {
 		Vector temp = smult (speed, &(camera.heading));
 		cpos = vplus (&cpos, &temp);
-		if (viewDirection == 1) target = vplus (&cpos, &temp);
-		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
-		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
-		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	}
+	if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+	else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+	else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+	else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	glutPostRedisplay ();
 }
 
@@ -188,7 +188,7 @@ void initialiseGL (void) {
 	glEnable (GL_LIGHTING);
 	glEnable (GL_LIGHT0);
 	glEnable (GL_COLOR_MATERIAL);
-	float light_pos[] = {100, 100, 100, 1};
+	float light_pos[] = {100, 100, 100, 0};
 	float light_ambient[] = {0.3, 0.3, 0.3, 1};
 	float light_diffuse[] = {0.1, 0.1, 0.1, 1};
 	float light_specular[] = {0, 0, 0, 1};
