@@ -4,22 +4,15 @@ int bodyTotal;
 Body *bodyArray;
 Hlu camera;
 double steps = 2.0;
-double speed = 0.0;
 Vector cpos, target;
+Vector com;
+double massTotal;
 bool keyStates[256];
 bool specialStates[256];
 int viewDirection;
 
 void timerFunc (int notUsed) {
 
-	if (speed != 0.0) {
-		Vector temp = smult (speed, &(camera.heading));
-		cpos = vplus (&cpos, &temp);
-	}
-	if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
-	else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
-	else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
-	else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	glutPostRedisplay ();
 }
 
@@ -46,14 +39,42 @@ void keyboardUp (unsigned char key, int x, int y) {
 void keyboardOperations (void) {
 
 	if (keyStates[27]) exit(0);
-	if (keyStates['W'] || keyStates['w']) speed += 0.02;
+	if (keyStates['W'] || keyStates['w']) {
+		pitchDown (&camera);
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+	}
 	if (keyStates['S'] || keyStates['s']) {
-		speed -= 0.02;
-		if (speed < 0.01) speed = 0.0; 
+		pitchUp (&camera);
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+	}
+	if (keyStates['A'] || keyStates['a']) {
+		yawLeft (&camera);
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	}
+	if (keyStates['D'] || keyStates['d']) {
+		yawRight (&camera);
+		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	}
+	if (keyStates['Q'] || keyStates['q']) {
+		rollLeft (&camera);
+		if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	}
+	if (keyStates['E'] || keyStates['e']) {
+		rollRight (&camera);
+		if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	}
 	if (keyStates['R'] || keyStates['r']) {
 		steps = 2.0;
-		speed = 0.0;
 		initialiseSettings ();
 		initialiseArray ();
 	}
@@ -65,24 +86,11 @@ void keyboardOperations (void) {
 		steps /= STEP;
 		if(steps < 1) steps = 1;
 	}
-	if (keyStates[',']) {
-		yawLeft (&camera);
-		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
-		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
-		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
-		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
-	}
-	if (keyStates['.']) {
-		yawRight (&camera);
-		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
-		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
-		else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
-		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
-	}
 	if (keyStates['1']) viewDirection = 1;
 	if (keyStates['2']) viewDirection = 2;
 	if (keyStates['3']) viewDirection = 3;
 	if (keyStates['4']) viewDirection = 4;
+	if (keyStates['5']) viewDirection = 5;
 }
 
 void special (int key, int x, int y) {
@@ -98,24 +106,20 @@ void specialUp (int key, int x, int y) {
 void specialOperations (void) {
 
 	if (specialStates[GLUT_KEY_UP]) {
-		pitchDown (&camera);
-		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
-		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+		Vector temp = smult (CAMERA_SPEED, &(camera.heading));
+		cpos = vplus (&cpos, &temp);
 	}
 	if (specialStates[GLUT_KEY_DOWN]) {
-		pitchUp (&camera);
-		if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
-		else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+		Vector temp = smult (CAMERA_SPEED, &(camera.heading));
+		cpos = vminus (&cpos, &temp);
 	}
 	if (specialStates[GLUT_KEY_LEFT]) {
-		rollLeft (&camera);
-		if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
-		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+		Vector temp = smult (CAMERA_SPEED, &(camera.left));
+		cpos = vplus (&cpos, &temp);
 	}
 	if (specialStates[GLUT_KEY_RIGHT]) {
-		rollRight (&camera);
-		if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
-		else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+		Vector temp = smult (CAMERA_SPEED, &(camera.left));
+		cpos = vminus (&cpos, &temp);
 	}
 }
 
@@ -123,6 +127,11 @@ void display (void) {
 
 	keyboardOperations ();
 	specialOperations ();
+	if (viewDirection == 1) target = vplus (&cpos, &(camera.heading));
+	else if (viewDirection == 2) target = vminus (&cpos, &(camera.heading));
+	else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
+	else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
+	else if (viewDirection == 5) target = newVector (0, 0, 0);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
@@ -133,6 +142,7 @@ void display (void) {
 	glutTimerFunc (TIMERMSECS, timerFunc, 0);
 	bBegin = bodyArray;
 	bEnd = bodyArray + bodyTotal;
+//	com = newVector (0, 0, 0);
 	for (k = 0; k < (int)steps; ++k) {
 		for (bp = bBegin; bp != bEnd; ++bp) {
 			bp->acceleration = move (bp, bodyArray, bodyTotal);
@@ -146,9 +156,13 @@ void display (void) {
 		}
 	}
 	for (bp = bBegin; bp != bEnd; ++bp) {
+//		Vector temp = smult (bp->mass, &(bp->position));
+//		com = vplus (&com, &temp);
 		drawBody (&(bp->position), sqrt (bp->mass), &(bp->colour));
 		drawPath (bp);
 	}
+//	com = smult (1 / massTotal, &com);
+	//printf ("%f, %f, %f\n", com.x, com.y, com.z);
 	glutSwapBuffers ();
 }
 
@@ -215,13 +229,19 @@ void initialiseArray (void) {
 	int i;
 	double posrep = 2.0 / RAND_MAX;
 	double velrep = 0.004 / RAND_MAX;
+//	massTotal = 0;
+//	com = newVector (0, 0, 0);
 	for (i = 0; i < bodyTotal; ++i) {
 		bodyArray[i] = newBody (
 			newVector (1.0 - posrep * rand (), 1.0 - posrep * rand (), 1.0 - posrep * rand ()),
 			newVector (0.002 - velrep * rand (), 0.002 - velrep * rand (), 0.002 - velrep * rand ()),
 			100.0 * rand() / RAND_MAX
 		);
+//		Vector temp = smult (bodyArray[i].mass, &(bodyArray[i].position));
+//		com = vplus (&com, &temp);
+//		massTotal += bodyArray[i].mass;
 	}
+//	com = smult (1 / massTotal, &com);
 }
 
 int main (int argc, char **argv) {

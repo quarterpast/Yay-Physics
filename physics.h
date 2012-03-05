@@ -22,6 +22,7 @@
 #define INIT_WIN_HEIGHT 480
 #define TIMERMSECS 10
 #define STEP 1.2
+#define CAMERA_SPEED 0.05
 #define PATH_MOD(t) { if (t >= PATHLEN) t -= PATHLEN;}
 
 void timerFunc (int);
