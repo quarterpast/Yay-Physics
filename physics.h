@@ -1,19 +1,11 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#ifdef __linux__ 
-#include <GL/freeglut.h>
-#elif defined __APPLE__
-#include <OpenGL/gl.h>
-#include <GLUT/glut.h>
-#else
-#error Not supported 
-#endif // OS
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 #include <time.h>
+#include "openglincludes.h"
 #include "vector.h"
 #include "body.h"
 #include "hlu.h"
