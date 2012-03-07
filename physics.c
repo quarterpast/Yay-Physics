@@ -195,8 +195,13 @@ void initialiseGL (void) {
 	srand (time (NULL));
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glEnable (GL_DEPTH_TEST);
-	glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable (GL_BLEND);
+	glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
+	glEnable (GL_LINE_SMOOTH);
+	glLineWidth (1.6);
+	glHint (GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	glEnable (GL_POLYGON_SMOOTH);
 	glCullFace (GL_BACK);
 	glEnable (GL_CULL_FACE);
 	glEnable (GL_LIGHTING);
