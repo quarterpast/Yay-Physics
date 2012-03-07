@@ -91,6 +91,7 @@ void keyboardOperations (void) {
 	if (keyStates['3']) viewDirection = 3;
 	if (keyStates['4']) viewDirection = 4;
 	if (keyStates['5']) viewDirection = 5;
+	if (keyStates['6']) viewDirection = 6;
 }
 
 void special (int key, int x, int y) {
@@ -132,6 +133,10 @@ void display (void) {
 	else if (viewDirection == 3) target = vplus (&cpos, &(camera.left));
 	else if (viewDirection == 4) target = vminus (&cpos, &(camera.left));
 	else if (viewDirection == 5) target = newVector (0, 0, 0);
+	else if (viewDirection == 6) {
+		cpos = bodyArray[0].position;
+		target = vplus (&cpos, &(bodyArray[0].velocity));
+	}
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
