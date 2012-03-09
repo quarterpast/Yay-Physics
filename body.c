@@ -11,11 +11,13 @@ Body newBody (Vector pos, Vector vel, double mass) {
 		arr,
 		0
 	};
+	double radius = sqrt (mass) / 100;
 	Body out = {
 		pos,
 		vel,
 		{0, 0, 0},
 		mass,
+		radius,
 		path,
 		bodyColour ()
 	};

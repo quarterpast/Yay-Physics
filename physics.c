@@ -135,7 +135,8 @@ void display (void) {
 	else if (viewDirection == 5) target = newVector (0, 0, 0);
 	else if (viewDirection == 6) {
 		cpos = bodyArray[0].position;
-		target = vplus (&cpos, &(bodyArray[0].velocity));
+		//target = vplus (&cpos, &(bodyArray[0].velocity));
+		target = newVector (0, 0, 0);
 	}
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
@@ -163,7 +164,7 @@ void display (void) {
 	for (bp = bBegin; bp != bEnd; ++bp) {
 //		Vector temp = smult (bp->mass, &(bp->position));
 //		com = vplus (&com, &temp);
-		drawBody (&(bp->position), sqrt (bp->mass), &(bp->colour));
+		drawBody (&(bp->position), bp->radius, &(bp->colour));
 		drawPath (bp);
 	}
 //	com = smult (1 / massTotal, &com);
@@ -173,7 +174,6 @@ void display (void) {
 
 void drawBody (Vector *pos, double r, Vector *c) {
 
-	r /= 100;
 	glPushMatrix ();
 	glTranslated (pos->x, pos->y, pos->z);
 	glScaled (r, r, r);

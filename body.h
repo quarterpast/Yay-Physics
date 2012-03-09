@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include <stdlib.h>
+#include <math.h>
 #include "vector.h"
 
 #define PATHLEN 500
@@ -18,6 +19,7 @@ typedef struct {
 	Vector velocity;
 	Vector acceleration;
 	double mass;
+	double radius;
 	Path path;
 	Vector colour;
 } Body;
