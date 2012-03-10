@@ -48,6 +48,21 @@ Vector move (Body* thing, Body* rest, int l) {
 	return ds;
 }
 
+int collisionTest (Body* thing, Body* rest, int l) {
+
+	int isColliding = 0;
+	double r;
+	Body b;
+	Body *restEnd = rest + l;
+	for(; rest != restEnd; ++rest) {
+		if (rest == thing) continue;
+		b = *rest;
+		r = distance (&(thing->position), &(b.position));
+		if (r < (thing->radius + b.radius)) isColliding = 1;
+	}
+	return isColliding;
+}
+
 Vector bodyColour (void) {
 
 	double rep = 2.0 * RAND_MAX;

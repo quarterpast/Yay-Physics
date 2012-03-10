@@ -142,12 +142,14 @@ void display (void) {
 	glLoadIdentity ();
 	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
 	int k;
+	int isColliding;
 	Body *bp;
 	Body *bBegin;
 	Body *bEnd;
 	glutTimerFunc (TIMERMSECS, timerFunc, 0);
 	bBegin = bodyArray;
 	bEnd = bodyArray + bodyTotal;
+	Vector red = newVector (1, 0, 0);
 //	com = newVector (0, 0, 0);
 	for (k = 0; k < (int)steps; ++k) {
 		for (bp = bBegin; bp != bEnd; ++bp) {
@@ -164,7 +166,12 @@ void display (void) {
 	for (bp = bBegin; bp != bEnd; ++bp) {
 //		Vector temp = smult (bp->mass, &(bp->position));
 //		com = vplus (&com, &temp);
-		drawBody (&(bp->position), bp->radius, &(bp->colour));
+
+//		Check here for collision stuff...
+
+		isColliding = collisionTest (bp, bodyArray, bodyTotal);
+		if (isColliding == 1) drawBody (&(bp->position), bp->radius, &(red));
+		else drawBody (&(bp->position), bp->radius, &(bp->colour));
 		drawPath (bp);
 	}
 //	com = smult (1 / massTotal, &com);

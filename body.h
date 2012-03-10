@@ -27,6 +27,7 @@ typedef struct {
 Body newBody (Vector, Vector, double);
 double newt (double, double);
 Vector move (Body*, Body*, int);
+int collisionTest (Body*, Body*, int);
 Vector bodyColour (void);
 
 #endif
