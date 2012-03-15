@@ -1,7 +1,6 @@
 #ifndef BODY_H
 #define BODY_H
 
-#include <sys/types.h>
 #include <stdlib.h>
 #include <math.h>
 #include "vector.h"
@@ -19,6 +18,7 @@ typedef struct {
 	Vector velocity;
 	Vector acceleration;
 	double mass;
+	double gmass;
 	double radius;
 	Path path;
 	Vector colour;
@@ -26,8 +26,8 @@ typedef struct {
 
 Body newBody (Vector, Vector, double);
 double newt (double, double);
-Vector move (Body*, Body*, int);
-int collisionTest (Body*, Body*, int);
+Vector calculateAcceleration (Body*, Body*, int);
+void collisionTest (Body*, Body*, int);
 Vector bodyColour (void);
 
 #endif

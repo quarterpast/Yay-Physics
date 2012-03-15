@@ -5,8 +5,6 @@ Body *bodyArray;
 Hlu camera;
 double steps = 2.0;
 Vector cpos, target;
-//Vector com;
-//double massTotal;
 bool keyStates[256];
 bool specialStates[256];
 int viewDirection;
@@ -92,6 +90,7 @@ void keyboardOperations (void) {
 	if (keyStates['4']) viewDirection = 4;
 	if (keyStates['5']) viewDirection = 5;
 	if (keyStates['6']) viewDirection = 6;
+	if (keyStates['7']) viewDirection = 7;
 }
 
 void special (int key, int x, int y) {
@@ -135,25 +134,24 @@ void display (void) {
 	else if (viewDirection == 5) target = newVector (0, 0, 0);
 	else if (viewDirection == 6) {
 		cpos = bodyArray[0].position;
-		//target = vplus (&cpos, &(bodyArray[0].velocity));
 		target = newVector (0, 0, 0);
+	}	else if (viewDirection == 7) {
+		cpos = bodyArray[0].position;
+		target = vplus (&cpos, &(bodyArray[0].velocity));
 	}
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
 	int k;
-	int isColliding;
 	Body *bp;
 	Body *bBegin;
 	Body *bEnd;
 	glutTimerFunc (TIMERMSECS, timerFunc, 0);
 	bBegin = bodyArray;
 	bEnd = bodyArray + bodyTotal;
-	Vector red = newVector (1, 0, 0);
-//	com = newVector (0, 0, 0);
 	for (k = 0; k < (int)steps; ++k) {
 		for (bp = bBegin; bp != bEnd; ++bp) {
-			bp->acceleration = move (bp, bodyArray, bodyTotal);
+			bp->acceleration = calculateAcceleration (bp, bodyArray, bodyTotal);
 		}
 		for (bp = bBegin; bp != bEnd; ++bp) {
 			bp->velocity = vplus (&(bp->velocity), &(bp->acceleration));
@@ -162,20 +160,14 @@ void display (void) {
 			PATH_MOD (bp->path.pos);
 			bp->path.point[bp->path.pos] = bp->position;
 		}
+		for (bp = bBegin; bp != bEnd; ++bp) {
+			collisionTest (bp, bodyArray, bodyTotal);
+		}		
 	}
 	for (bp = bBegin; bp != bEnd; ++bp) {
-//		Vector temp = smult (bp->mass, &(bp->position));
-//		com = vplus (&com, &temp);
-
-//		Check here for collision stuff...
-
-		isColliding = collisionTest (bp, bodyArray, bodyTotal);
-		if (isColliding == 1) drawBody (&(bp->position), bp->radius, &(red));
-		else drawBody (&(bp->position), bp->radius, &(bp->colour));
+		drawBody (&(bp->position), bp->radius, &(bp->colour));
 		drawPath (bp);
 	}
-//	com = smult (1 / massTotal, &com);
-	//printf ("%f, %f, %f\n", com.x, com.y, com.z);
 	glutSwapBuffers ();
 }
 
@@ -236,7 +228,7 @@ void initialiseGL (void) {
 void initialiseSettings (void) {
 
 	camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
-	cpos = newVector (0, 0, 10);
+	cpos = newVector (0, 0, 5);
 	target = vplus (&cpos, &(camera.heading));
 	viewDirection = 1;	
 }
@@ -244,11 +236,13 @@ void initialiseSettings (void) {
 void initialiseArray (void) {
 
 	int i;
-	double posrep = 2.0 / RAND_MAX;
-	double velrep = 0.004 / RAND_MAX;
-//	massTotal = 0;
-//	com = newVector (0, 0, 0);
+	static const double posrep = 2.0 / RAND_MAX;
+	static const double velrep = 0.004 / RAND_MAX;
+//	double massTotal = 0;
+//	Vector com = newVector (0, 0, 0);
+//	Vector cov = newVector (0, 0, 0);
 	for (i = 0; i < bodyTotal; ++i) {
+//		if (i == 0) bodyArray[i] = newBody ( newVector (0, 0, 0), newVector (0, 0, 0), 10000);
 		bodyArray[i] = newBody (
 			newVector (1.0 - posrep * rand (), 1.0 - posrep * rand (), 1.0 - posrep * rand ()),
 			newVector (0.002 - velrep * rand (), 0.002 - velrep * rand (), 0.002 - velrep * rand ()),
@@ -257,8 +251,15 @@ void initialiseArray (void) {
 //		Vector temp = smult (bodyArray[i].mass, &(bodyArray[i].position));
 //		com = vplus (&com, &temp);
 //		massTotal += bodyArray[i].mass;
+//		temp = smult (bodyArray[i].mass, &(bodyArray[i].velocity));
+//		cov = vplus (&cov, &temp);
 	}
 //	com = smult (1 / massTotal, &com);
+//	cov = smult (1 / massTotal, &cov);
+//	for (i = 0; i < bodyTotal; ++i) {
+//		bodyArray[i].position = vminus (&(bodyArray[i].position), &com);
+//		bodyArray[i].velocity = vminus (&(bodyArray[i].velocity), &cov);
+//	}
 }
 
 int main (int argc, char **argv) {

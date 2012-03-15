@@ -23,4 +23,5 @@ V - Reset camera
 3 - Left view
 4 - Right view
 5 - Origin view
-6 - Particle view
+6 - Particle view, facing origin
+7 - Particle view, facing particle's velocity

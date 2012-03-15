@@ -16,5 +16,6 @@ Vector smult (double, Vector*);
 double norm (Vector*);
 double distance (Vector*, Vector*);
 Vector unit (Vector*);
+double dot (Vector*, Vector*);
 
 #endif

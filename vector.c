@@ -44,3 +44,8 @@ Vector unit (Vector *a) {
 	Vector out = {(a->x) / n, (a->y) / n, (a->z) / n};
 	return out;
 }
+
+double dot (Vector *a, Vector *b) {
+
+	return (a->x * b->x + a->y * b->y + a->z * b->z);
+}
