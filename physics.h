@@ -31,5 +31,6 @@ void drawPath (Body *);
 void initialiseGL (void);
 void initialiseSettings (void);
 void initialiseArray (void);
+void centraliseCoM (void);
 
 #endif // PHYSICS_H

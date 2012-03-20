@@ -5,7 +5,7 @@
 #include <math.h>
 #include "vector.h"
 
-#define PATHLEN 500
+#define PATHLEN 512
 #define G 1e-8
 
 typedef struct {

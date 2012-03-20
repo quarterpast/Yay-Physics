@@ -8,6 +8,7 @@ Vector cpos, target;
 bool keyStates[256];
 bool specialStates[256];
 int viewDirection;
+double massTotal;
 
 void timerFunc (int notUsed) {
 
@@ -91,6 +92,7 @@ void keyboardOperations (void) {
 	if (keyStates['5']) viewDirection = 5;
 	if (keyStates['6']) viewDirection = 6;
 	if (keyStates['7']) viewDirection = 7;
+	if (keyStates['0']) steps = 2.0;
 }
 
 void special (int key, int x, int y) {
@@ -143,12 +145,15 @@ void display (void) {
 	glLoadIdentity ();
 	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
 	int k;
+	Vector com, cov;
 	Body *bp;
 	Body *bBegin;
 	Body *bEnd;
 	glutTimerFunc (TIMERMSECS, timerFunc, 0);
 	bBegin = bodyArray;
 	bEnd = bodyArray + bodyTotal;
+	com = newVector (0, 0, 0);
+	cov = newVector (0, 0, 0);
 	for (k = 0; k < (int)steps; ++k) {
 		for (bp = bBegin; bp != bEnd; ++bp) {
 			bp->acceleration = calculateAcceleration (bp, bodyArray, bodyTotal);
@@ -165,9 +170,20 @@ void display (void) {
 		}		
 	}
 	for (bp = bBegin; bp != bEnd; ++bp) {
+		Vector temp = smult (bp->mass, &(bp->position));
+		com = vplus (&com, &temp);
+		temp = smult (bp->mass, &(bp->velocity));
+		cov = vplus (&cov, &temp);
 		drawBody (&(bp->position), bp->radius, &(bp->colour));
 		drawPath (bp);
 	}
+	com = smult (1 / massTotal, &com);
+	cov = smult (1 / massTotal, &cov);
+	for (bp = bBegin; bp != bEnd; ++bp) {
+		bp->position = vminus (&(bp->position), &com);
+		bp->velocity = vminus (&(bp->velocity), &cov);
+	}
+	//printf ("%f, %f, %f; %f, %f, %f\n", com.x, com.y, com.z, cov.x, cov.y, cov.z);
 	glutSwapBuffers ();
 }
 
@@ -235,31 +251,39 @@ void initialiseSettings (void) {
 
 void initialiseArray (void) {
 
-	int i;
+	Body *bp;
+	Body *bBegin;
+	Body *bEnd;
+	bBegin = bodyArray;
+	bEnd = bodyArray + bodyTotal;
+	Vector com, cov;
 	static const double posrep = 2.0 / RAND_MAX;
 	static const double velrep = 0.004 / RAND_MAX;
-//	double massTotal = 0;
-//	Vector com = newVector (0, 0, 0);
-//	Vector cov = newVector (0, 0, 0);
-	for (i = 0; i < bodyTotal; ++i) {
-//		if (i == 0) bodyArray[i] = newBody ( newVector (0, 0, 0), newVector (0, 0, 0), 10000);
-		bodyArray[i] = newBody (
+	massTotal = 0;
+	com = newVector (0, 0, 0);
+	cov = newVector (0, 0, 0);
+	for (bp = bBegin; bp != bEnd; ++bp) {
+		*bp = newBody (
 			newVector (1.0 - posrep * rand (), 1.0 - posrep * rand (), 1.0 - posrep * rand ()),
 			newVector (0.002 - velrep * rand (), 0.002 - velrep * rand (), 0.002 - velrep * rand ()),
 			100.0 * rand() / RAND_MAX
 		);
-//		Vector temp = smult (bodyArray[i].mass, &(bodyArray[i].position));
-//		com = vplus (&com, &temp);
-//		massTotal += bodyArray[i].mass;
-//		temp = smult (bodyArray[i].mass, &(bodyArray[i].velocity));
-//		cov = vplus (&cov, &temp);
+		Vector temp = smult (bp->mass, &(bp->position));
+		com = vplus (&com, &temp);
+		massTotal += bp->mass;
+		temp = smult (bp->mass, &(bp->velocity));
+		cov = vplus (&cov, &temp);
 	}
-//	com = smult (1 / massTotal, &com);
-//	cov = smult (1 / massTotal, &cov);
-//	for (i = 0; i < bodyTotal; ++i) {
-//		bodyArray[i].position = vminus (&(bodyArray[i].position), &com);
-//		bodyArray[i].velocity = vminus (&(bodyArray[i].velocity), &cov);
-//	}
+	com = smult (1 / massTotal, &com);
+	cov = smult (1 / massTotal, &cov);
+	for (bp = bBegin; bp != bEnd; ++bp) {
+		bp->position = vminus (&(bp->position), &com);
+		int i;
+		for (i = 0; i < PATHLEN; i++) {
+			bp->path.point[i] = bp->position;
+		}
+		bp->velocity = vminus (&(bp->velocity), &cov);
+	}
 }
 
 int main (int argc, char **argv) {
@@ -276,10 +300,10 @@ int main (int argc, char **argv) {
 	glutSpecialFunc (special);
 	glutSpecialUpFunc (specialUp);
 	if(argc != 2) {
-		printf("Usage: %s numbodies; Continuing with 100\n",argv[0]);
+		printf ("Usage: %s numbodies; Continuing with 100\n", argv[0]);
 		bodyTotal = 100;
 	}
-	else bodyTotal = atoi(argv[1]);
+	else bodyTotal = atoi (argv[1]);
 	bodyArray = malloc (bodyTotal * sizeof (Body));
 	initialiseGL ();
 	initialiseArray ();

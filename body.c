@@ -51,40 +51,37 @@ Vector calculateAcceleration (Body* currentBody, Body* allBodies, int bodyTotal)
 
 void collisionTest (Body* currentBody, Body* allBodies, int bodyTotal) {
 
-	double r;
+	double r, rsquare, radiusSum, combinedMass, v1nlength, v2nlength, v1mult, v2mult, body1proportion, body2proportion;
+	Vector unitnormal, reposition, temp1, temp2, v1n, v1t, v2n, v2t;
 	Body *finalBody = allBodies + bodyTotal;
 	for(; allBodies != finalBody; ++allBodies) {
 		if (allBodies == currentBody) continue;
-		r = distance (&(currentBody->position), &(allBodies->position));
-		if (r < (currentBody->radius + allBodies->radius)) {
-
-			double combinedMass = currentBody->mass + allBodies->mass;
-
-			Vector unitnormal = vminus (&(currentBody->position), &(allBodies->position));
+		unitnormal = vminus (&(currentBody->position), &(allBodies->position));
+		rsquare = unitnormal.x * unitnormal.x + unitnormal.y * unitnormal.y + unitnormal.z * unitnormal.z;
+		r = sqrt (rsquare);
+		radiusSum = currentBody->radius + allBodies->radius;
+		if (r < radiusSum) {
+			combinedMass = currentBody->mass + allBodies->mass;
 			unitnormal = unit (&unitnormal);
-			Vector reposition;
-			reposition = smult (currentBody->radius + allBodies->radius - r, &unitnormal);
-			Vector temp1, temp2;
-			temp1 = smult (allBodies->mass / combinedMass, &reposition);
-			temp2 = smult (currentBody->mass / combinedMass, &reposition);
+			body1proportion = allBodies->mass / combinedMass;
+			body2proportion = currentBody->mass / combinedMass;
+			reposition = smult (radiusSum - r, &unitnormal);
+			temp1 = smult (body1proportion, &reposition);
+			temp2 = smult (body2proportion, &reposition);
 			currentBody->position = vplus (&(currentBody->position), &temp1);
 			allBodies->position = vminus (&(allBodies->position), &temp2);
-
-			Vector v1n, v1t, v2n, v2t;
-			v1n = smult (dot (&(currentBody->velocity), &unitnormal), &unitnormal);
-			v2n = smult (dot (&(allBodies->velocity), &unitnormal), &unitnormal);
+			v1nlength = dot (&(currentBody->velocity), &unitnormal);
+			v2nlength = dot (&(allBodies->velocity), &unitnormal);
+			v1n = smult (v1nlength, &unitnormal);
+			v2n = smult (v2nlength, &unitnormal);
 			v1t = vminus (&(currentBody->velocity), &v1n);
 			v2t = vminus (&(allBodies->velocity), &v2n);
-
-			double v1nlength = norm (&v1n);
-			double v2nlength = norm (&v2n);
-
-			double v1mult = ((currentBody->mass - allBodies->mass) / combinedMass * v1nlength) + (2 * allBodies->mass / combinedMass * v2nlength);
-			double v2mult = ((allBodies->mass - currentBody->mass) / combinedMass * v2nlength) + (2 * currentBody->mass / combinedMass * v1nlength);
-
+			v1nlength = fabs (v1nlength);
+			v2nlength = fabs (v2nlength);
+			v1mult = ((currentBody->mass - allBodies->mass) / combinedMass * v1nlength) + (2 * body1proportion * v2nlength);
+			v2mult = ((allBodies->mass - currentBody->mass) / combinedMass * v2nlength) + (2 * body2proportion * v1nlength);
 			temp1 = smult (v1mult, &unitnormal);
 			temp2 = smult (v2mult, &unitnormal);
-
 			currentBody->velocity = vplus (&v1t, &temp1);
 			allBodies->velocity = vminus (&v2t, &temp2);
 		}
