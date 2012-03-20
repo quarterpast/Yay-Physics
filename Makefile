@@ -9,7 +9,7 @@ CC=gcc
 ifeq ($(UNAME), Darwin)
 	CFLAGS=-framework OpenGL -framework GLUT
 else
-	CFLAGS=-pg -O3 -lm `pkg-config --cflags --libs glut`
+	CFLAGS=-Wall -g -O3 -lm `pkg-config --cflags --libs glut`
 endif
 C_FILES := $(wildcard *.c)
 OBJS := $(patsubst %.c, %.o, $(C_FILES))

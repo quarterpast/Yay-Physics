@@ -1,0 +1,27 @@
+Yay-Physics Controls:
+
+W - Pitch down
+S - Pitch up
+A - Yaw left
+D - Yaw right
+Q - Roll left
+E - Roll right
+
+Up Arrow - Move forwards
+Down Arrow - Move backwards
+Left Arrow - Strafe left
+Right Arrow - Strafe right
+
++ - Increase particle speed
+- - Decrease particle speed
+
+R - Restart program
+V - Reset camera
+
+1 - Front view
+2 - Rear view
+3 - Left view
+4 - Right view
+5 - Origin view
+6 - Particle view, facing origin
+7 - Particle view, facing particle's velocity
