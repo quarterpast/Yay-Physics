@@ -113,7 +113,7 @@ void display() {
 	bBegin = b + 1;
 	bEnd = b + bodies;
 	for(k = 0; k < (int)steps; ++k) {
-		for(bp = bBegin, j = 1; bp != bEnd; ++bp, ++j) {
+		for(bp = bBegin, j = 1; bp != bEnd; ++bp) {
 			bp->acceleration = move(bp, b, bodies);
 		}
 		for(bp = bBegin; bp != bEnd; ++bp) {
