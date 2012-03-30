@@ -1,3 +1,9 @@
+/*
+Try to avoid using list nodes directly as this may throw the list out of sync.
+The best way to interact with a list is through list iterators and the
+corresponding list-centric functions.
+*/
+
 typedef struct _ListNode {
 	void			 *data;
 	struct _ListNode *next;
@@ -51,6 +57,12 @@ Asserts if i is an invalid index. Indexing starts from 0. Returns the data
 pointer at node i.
 */
 void * dataAtIndex(List *l, int i);
+
+/*
+Assumes l and it are not NULL. Returns the data at it, removes it from the list
+and updates begin and end of l if needed.
+*/
+void * takeAtListIterator(List *l, ListIterator it);
 
 /*
 Asserts if i is an invalid index. Indexing starts from 0. Returns the data

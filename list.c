@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+/* Used internally to insert to an empty list. */
+static void firstInsert(List *l, void *data);
+
 ListNode * newListNode() {
 	ListNode *ret = (ListNode *)malloc(sizeof(ListNode));
 	ret->data = NULL;
@@ -96,27 +99,45 @@ void * dataAtIndex(List *l, int i) {
 		return NULL;
 }
 
-void * takeAtIndex(List *l, int i) {
-	ListNode *node = listNodeAtIndex(l, i);
+void * takeAtListIterator(List *l, ListIterator it) {
 	if (node == l->begin)
 		l->begin = node->next;
-	else if (node == l->rend)
+	if (node == l->rend)
 		l->rend = node->previous;
 	return takeAtListNode(node);
 }
 
-void insertAfterIndex(List *l, int i, void *data) {
+void * takeAtIndex(List *l, int i) {
 	ListNode *node = listNodeAtIndex(l, i);
-	insertAfter(node, data);
-	if (node == l->rend)
-		l->rend = node->next;
+	return takeAtListIterator(l, node);
+}
+
+static void firstInsert(List *l, void *data) {
+	l->begin = newListNode();
+	l->begin->data = data;
+	l->end = l->begin;
+}
+
+void insertAfterIndex(List *l, int i, void *data) {
+	if (l->start == NULL) {
+		firstInsert(l, data);
+	} else {
+		ListNode *node = listNodeAtIndex(l, i);
+		insertAfter(node, data);
+		if (node == l->rend)
+			l->rend = node->next;
+	}
 }
 
 void insertBeforeIndex(List *l, int i, void *data) {
-	ListNode *node = listNodeAtIndex(l, i);
-	insertBefore(node, data);
-	if (node == l->begin)
-		l->begin = node->previous;
+	if (l->start == NULL) {
+		firstInsert(l, data);
+	} else {
+		ListNode *node = listNodeAtIndex(l, i);
+		insertBefore(node, data);
+		if (node == l->begin)
+			l->begin = node->previous;
+	}
 }
 
 void pushFront(List *l, void *data) {
