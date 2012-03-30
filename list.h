@@ -8,7 +8,7 @@ corresponding list-centric functions.
 */
 
 typedef struct _ListNode {
-	void			 *data;
+	void             *data;
 	struct _ListNode *next;
 	struct _ListNode *previous;
 } ListNode;
