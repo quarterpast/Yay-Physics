@@ -174,30 +174,3 @@ void drawCircle(Vector *pos, double r, Colour *c) {
 	
 	glPopMatrix();
 }
-
-int main(int argc, char **argv) {
-	if(argc < 2) {
-		printf("Usage: %s numbodies\n",argv[0]);
-		return 1;
-	}
-	bodies = atoi(argv[1]);
-
-	init();
-
-	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_DOUBLE | GLUT_ALPHA);
-	glutInitWindowSize (WIDTH, HEIGHT);
-	glutInitWindowPosition (0, 0);
-	glutCreateWindow("Yay physics");
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClearColor (0.0,0.0,0.0,1.0);
-
-	glutDisplayFunc(display);
-	glutTimerFunc(TIMERMSECS, timerFunc, 0);
-	glutKeyboardFunc(keyPressed);
-	glutReshapeFunc(reshape);
-
-	glutMainLoop();
-}
