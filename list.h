@@ -1,3 +1,6 @@
+#ifndef LIST_H
+#define LIST_H
+
 /*
 Try to avoid using list nodes directly as this may throw the list out of sync.
 The best way to interact with a list is through list iterators and the
@@ -93,3 +96,5 @@ Removes the last node in the list, deletes it and returns its data pointer.
 If the list is empty NULL is returned.
 */
 void * popBack(List *l);
+
+#endif /* LIST_H */
