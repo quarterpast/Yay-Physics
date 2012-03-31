@@ -46,17 +46,20 @@ bool collide(Body *thing, Body *rest, int l, int skip) {
 	}
 	return false;
 }
-Vector move(Body* thing, Body* rest, int l) {
+Vector move(ListIterator thing, List *rest, int l) {
+	// move(Body* thing, Body* rest, int l) {
 	double n, r;
-	Vector ds = {0,0}, diff, u ,m;
-	Body b;
-	Body *restEnd = rest + l;
-	for(; rest != restEnd; ++rest) {
-		if (rest == thing) continue;
-		b = *rest;
-		r = distance(&(thing->position), &(b.position));
+	Vector ds = {0.0, 0.0}, diff, u ,m;
+
+	Body *b;
+	ListIterator it;
+	for(it = rest->start; it != NULL; it = it->next) {
+		if (it == thing)
+			continue;
+		b = rest->data;
+		r = distance(&(thing->position), &(b->position));
 		n = newt(rest->mass, r);
-		diff = vminus(&(b.position), &(thing->position));
+		diff = vminus(&(b->position), &(thing->position));
 
 		u = unit(&diff);
 		m = smult(n, &u);

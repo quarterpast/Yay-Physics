@@ -6,6 +6,7 @@
 
 #include "vector.h"
 #include "colour.h"
+#include "list.h"
 
 #define PATHLEN 200
 
@@ -26,6 +27,6 @@ typedef struct {
 Body newBody(Vector, Vector, double);
 double newt(double, double);
 bool collide(Body*, Body*, int, int);
-Vector move(Body*, Body*, int);
+Vector move(ListIterator thing, List *rest, int l);
 
 #endif

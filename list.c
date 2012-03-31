@@ -100,11 +100,11 @@ void * dataAtIndex(List *l, int i) {
 }
 
 void * takeAtListIterator(List *l, ListIterator it) {
-	if (node == l->begin)
-		l->begin = node->next;
-	if (node == l->rend)
-		l->rend = node->previous;
-	return takeAtListNode(node);
+	if (it == l->begin)
+		l->begin = it->next;
+	if (it == l->rend)
+		l->rend = it->previous;
+	return takeAtListNode(it);
 }
 
 void * takeAtIndex(List *l, int i) {

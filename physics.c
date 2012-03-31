@@ -10,6 +10,8 @@
 #include "body.h"
 #include "unitcircle.h"
 
+#include "list.h"
+
 #define WIDTH 750
 #define HEIGHT 750
 
@@ -18,7 +20,8 @@
 
 #define PATH_MOD(t) {if(t>=PATHLEN) t-=PATHLEN;}
 
-Body *b;
+//Body *b;
+List *bodyList; // replaces b!!!
 int bodies;
 double steps = 2.0;
 int width = WIDTH;
@@ -34,10 +37,12 @@ void init() {
 	numUnitCircleVertices = 64;
 	unitCircle = generateUnitCircle(numUnitCircleVertices);
 
-	b = (Body *)malloc(bodies*sizeof(Body));
+	//b = (Body *)malloc(bodies*sizeof(Body));
+	bodyList = newList();
 	int i;
 	for(i=0;i<bodies;++i) {
-		b[i] = newBody(
+		Body *b = (Body *)malloc(sizeof(Body));
+		*b = newBody(
 			newVector(
 				1-2*(float)rand()/(float)RAND_MAX,
 				1-2*(float)rand()/(float)RAND_MAX
@@ -48,8 +53,8 @@ void init() {
 			),
 			100*(float)rand()/(float)RAND_MAX
 		);
+		pushBack(bodyList, b);
 	}
-	b[0] = newBody(newVector(0,0.0001),newVector(0,0),2000);
 }
 
 void timerFunc(int notUsed) {
@@ -100,46 +105,54 @@ void reshape (int w, int h) {
 	height = h;
 	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
 }
+
 void display() {
 	glClear (GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 	int k, j;
-	Body *bp;
-	Body *bBegin;
-	Body *bEnd;
+	// Body *bp;
+	// Body *bBegin;
+	// Body *bEnd;
+	Body *b;
+	ListIterator it;
+
 	//Colour red = {1.0,0.0,0.0,0.5};
 	glutTimerFunc(TIMERMSECS, timerFunc, 0);
 
-	bBegin = b + 1;
-	bEnd = b + bodies;
+	// bBegin = b + 1;
+	// bEnd = b + bodies;
 	for(k = 0; k < (int)steps; ++k) {
-		for(bp = bBegin, j = 1; bp != bEnd; ++bp) {
-			bp->acceleration = move(bp, b, bodies);
+		for(it = bodyList->begin; bp != NULL; it = it->next) {
+			b = it->data;
+			b->acceleration = move(it, bodyList, bodies);
 		}
-		for(bp = bBegin; bp != bEnd; ++bp) {
-			bp->velocity = vplus(&(bp->velocity), &(bp->acceleration));
-			bp->position = vplus(&(bp->position), &(bp->velocity));
-			bp->path.pos++;
-			PATH_MOD(bp->path.pos);
-			bp->path.point[bp->path.pos] = bp->position;
+		for(it = bodyList->begin; it != NULL; it = it->next) {
+			b = it->data;
+			b->velocity = vplus(&(b->velocity), &(b->acceleration));
+			b->position = vplus(&(b->position), &(b->velocity));
+			b->path.pos++;
+			PATH_MOD(b->path.pos);
+			b->path.point[b->path.pos] = b->position;
 		}
 	}
-	for(bp = b; bp != bEnd; ++bp) {
-		//if(collide(&(b[j]),b,bodies,j)) b[j].colour = red;
-		drawCircle(&(bp->position), sqrt(bp->mass), &(bp->colour));
-		traverse(bp);
+	for(it = bodyList->begin; it != NULL; it = it->next) {
+		b = it->data;
+		drawCircle(&(b->position), sqrt(b->mass), &(b->colour));
+		traverse(b);
 	}
 	glutSwapBuffers();
 }
+
 Vector coordToScreen(Vector *pos) {
 	Vector out = { pos->x*WIDTH/width, pos->y*HEIGHT/height };
 	return out;
 }
+
 void traverse(Body *b) {
 	int i,j;
 	glBegin(GL_LINE_STRIP);
 	for(i = 1; i<PATHLEN; i++) {
-		j = i+b->path.pos;
+		j = i+bpath.pos;
 		PATH_MOD(j);
 		Vector px = coordToScreen(&(b->path.point[j]));
 		glColor4f(
