@@ -1,5 +1,7 @@
 #include "vector.h"
 
+#include <math.h>
+
 Vector newVector (double x, double y, double z) {
 
 	Vector out = {x, y, z};

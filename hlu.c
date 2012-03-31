@@ -1,9 +1,14 @@
 #include "hlu.h"
 
-Hlu newHlu (Vector heading, Vector left, Vector up) {
+#include <math.h>
 
-	Hlu out = {heading, left, up};
-	return out;
+#define TURN_ANGLE 0.02
+#define CTHETA (cos (TURN_ANGLE))
+#define STHETA (sin (TURN_ANGLE))
+
+Hlu newHlu (Vector *heading, Vector *left, Vector *up) {
+
+	return (Hlu){*heading, *left, *up};
 }
 
 void pitchUp (Hlu *c) {

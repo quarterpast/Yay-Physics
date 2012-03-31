@@ -1,5 +1,23 @@
 #include "physics.h"
 
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+#include "openglincludes.h"
+#include "vector.h"
+#include "body.h"
+#include "hlu.h"
+
+#define INIT_WIN_WIDTH 640
+#define INIT_WIN_HEIGHT 480
+#define TIMERMSECS 10
+#define STEP 1.2
+#define CAMERA_SPEED 0.05
+#define PATH_MOD(t) { if (t >= PATHLEN) t -= PATHLEN;}
+
 int bodyTotal;
 Body *bodyArray;
 Hlu camera;
@@ -243,7 +261,7 @@ void initialiseGL (void) {
 
 void initialiseSettings (void) {
 
-	camera = newHlu (newVector (0, 0, -1), newVector (-1, 0, 0), newVector (0, 1, 0));
+	camera = newHlu (&(Vector){0.0, 0.0, -1.0}, &(Vector){-1.0, 0.0, 0.0}, &(Vector){0.0, 1.0, 0.0});
 	cpos = newVector (0, 0, 5);
 	target = vplus (&cpos, &(camera.heading));
 	viewDirection = 1;	

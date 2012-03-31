@@ -1,8 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <math.h>
-
 typedef struct {
 	double x;
 	double y;
@@ -18,4 +16,4 @@ double distance (Vector*, Vector*);
 Vector unit (Vector*);
 double dot (Vector*, Vector*);
 
-#endif
+#endif // VECTOR_H

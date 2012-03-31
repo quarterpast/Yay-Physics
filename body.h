@@ -1,12 +1,11 @@
 #ifndef BODY_H
 #define BODY_H
 
-#include <stdlib.h>
-#include <math.h>
+#include <sys/types.h>
+
 #include "vector.h"
 
-#define PATHLEN 512
-#define G 1e-8
+#define PATHLEN 200
 
 typedef struct {
 	Vector *point;
@@ -30,4 +29,4 @@ Vector calculateAcceleration (Body*, Body*, int);
 void collisionTest (Body*, Body*, int);
 Vector bodyColour (void);
 
-#endif
+#endif // BODY_H
