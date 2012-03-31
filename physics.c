@@ -161,17 +161,24 @@ void display (void) {
 	}
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
+ 
+	float light_pos[] = {bodyArray[0].position.x, bodyArray[0].position.y, bodyArray[0].position.z, 0};
+	glLightfv (GL_LIGHT0, GL_POSITION, light_pos);
+
 	gluLookAt (cpos.x, cpos.y, cpos.z, target.x, target.y, target.z, camera.up.x, camera.up.y, camera.up.z);
 	int k;
-	Vector com, cov;
+
+//	double energy = 0;
+
+//	Vector com, cov;
 	Body *bp;
 	Body *bBegin;
 	Body *bEnd;
 	glutTimerFunc (TIMERMSECS, timerFunc, 0);
 	bBegin = bodyArray;
 	bEnd = bodyArray + bodyTotal;
-	com = newVector (0, 0, 0);
-	cov = newVector (0, 0, 0);
+//	com = newVector (0, 0, 0);
+//	cov = newVector (0, 0, 0);
 	for (k = 0; k < (int)steps; ++k) {
 		for (bp = bBegin; bp != bEnd; ++bp) {
 			bp->acceleration = calculateAcceleration (bp, bodyArray, bodyTotal);
@@ -188,20 +195,27 @@ void display (void) {
 		}		
 	}
 	for (bp = bBegin; bp != bEnd; ++bp) {
-		Vector temp = smult (bp->mass, &(bp->position));
-		com = vplus (&com, &temp);
-		temp = smult (bp->mass, &(bp->velocity));
-		cov = vplus (&cov, &temp);
+//		Vector temp = smult (bp->mass, &(bp->position));
+//		com = vplus (&com, &temp);
+//		temp = smult (bp->mass, &(bp->velocity));
+//		cov = vplus (&cov, &temp);
+
+//		energy += bp->mass * dot (&(bp->velocity), &(bp->velocity));
+
 		drawBody (&(bp->position), bp->radius, &(bp->colour));
-		drawPath (bp);
+//		drawPath (bp);
 	}
-	com = smult (1 / massTotal, &com);
-	cov = smult (1 / massTotal, &cov);
-	for (bp = bBegin; bp != bEnd; ++bp) {
-		bp->position = vminus (&(bp->position), &com);
-		bp->velocity = vminus (&(bp->velocity), &cov);
-	}
-	//printf ("%f, %f, %f; %f, %f, %f\n", com.x, com.y, com.z, cov.x, cov.y, cov.z);
+//	com = smult (1 / massTotal, &com);
+//	cov = smult (1 / massTotal, &cov);
+
+//	energy /= 2;
+//	printf ("%f\n", energy);
+
+//	for (bp = bBegin; bp != bEnd; ++bp) {
+//		bp->position = vminus (&(bp->position), &com);
+//		bp->velocity = vminus (&(bp->velocity), &cov);
+//	}
+//	printf ("%f, %f, %f; %f, %f, %f\n", com.x, com.y, com.z, cov.x, cov.y, cov.z);
 	glutSwapBuffers ();
 }
 
@@ -245,11 +259,11 @@ void initialiseGL (void) {
 	glEnable (GL_LIGHTING);
 	glEnable (GL_LIGHT0);
 	glEnable (GL_COLOR_MATERIAL);
-	float light_pos[] = {100, 100, 100, 0};
+//	float light_pos[] = {100, 100, 100, 0};
 	float light_ambient[] = {0.3, 0.3, 0.3, 1};
 	float light_diffuse[] = {0.1, 0.1, 0.1, 1};
 	float light_specular[] = {0, 0, 0, 1};
-	glLightfv (GL_LIGHT0, GL_POSITION, light_pos);
+//	glLightfv (GL_LIGHT0, GL_POSITION, light_pos);
 	glLightfv (GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv (GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv (GL_LIGHT0, GL_SPECULAR, light_specular);
